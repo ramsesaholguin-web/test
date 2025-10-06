@@ -1,0 +1,132 @@
+models:
+  AccountStatus:
+    name: string:50 unique notnull
+
+  UserStatus:
+    name: string:50 unique notnull
+
+  FuelType:
+    name: string:50 unique notnull
+
+  VehicleStatus:
+    name: string:50 unique notnull
+
+  RequestStatus:
+    name: string:50 unique notnull
+
+  MaintenanceType:
+    name: string:100 unique notnull
+
+  WarningType:
+    name: string:100 unique notnull
+
+  EvidenceType:
+    name: string:100 unique notnull
+
+  Vehicle:
+    brand: string:100 notnull
+    model: string:100 notnull
+    year: integer notnull
+    plate: string:20 unique notnull
+    vin: string:50 unique notnull
+    fuel_type_id: id foreign:fuel_type.id notnull
+    current_mileage: integer notnull
+    status_id: id foreign:vehicle_status.id notnull
+    current_location: string:255 nullable
+    note: text nullable
+    registration_date: timestamp useCurrent
+    # Relaciones
+    belongsTo: FuelType, VehicleStatus
+
+  Warning:
+    user_id: id foreign:user.id notnull
+    warning_date: timestamp notnull
+    warning_type_id: id foreign:warning_type.id notnull
+    description: text nullable
+    evidence_url: string:255 nullable
+    warned_by: id foreign:user.id notnull
+    # Relaciones
+    belongsTo: User, WarningType
+
+  VehicleDocument:
+    vehicle_id: id foreign:vehicle.id notnull
+    document_name: string:100 notnull
+    file_path: string:255 notnull
+    expiration_date: date nullable
+    upload_date: timestamp useCurrent
+    uploaded_by: id foreign:user.id notnull
+    # Relaciones
+    belongsTo: Vehicle, User
+
+  VehicleRequest:
+    user_id: id foreign:user.id notnull
+    vehicle_id: id foreign:vehicle.id notnull
+    requested_departure_date: timestamp notnull
+    requested_return_date: timestamp notnull
+    description: text nullable
+    destination: string:255 nullable
+    event: string:255 nullable
+    request_status_id: id foreign:request_status.id notnull
+    approval_date: timestamp nullable
+    approved_by: id foreign:user.id nullable
+    approval_note: text nullable
+    creation_date: timestamp useCurrent
+    # Relaciones
+    belongsTo: User, Vehicle, RequestStatus
+
+  VehicleUsageHistory:
+    request_id: id foreign:vehicle_request.id notnull
+    departure_mileage: integer notnull
+    departure_fuel_level: decimal:5,2 notnull
+    actual_departure_date: timestamp notnull
+    departure_note: text nullable
+    return_mileage: integer nullable
+    return_fuel_level: decimal:5,2 nullable
+    actual_return_date: timestamp nullable
+    return_note: text nullable
+    # Relaciones
+    belongsTo: VehicleRequest
+
+  HistoryEvidence:
+    history_id: id foreign:vehicle_usage_history.id notnull
+    evidence_type_id: id foreign:evidence_type.id notnull
+    url: string:255 notnull
+    # Relaciones
+    belongsTo: VehicleUsageHistory, EvidenceType
+
+  Maintenance:
+    vehicle_id: id foreign:vehicle.id notnull
+    maintenance_type_id: id foreign:maintenance_type.id notnull
+    maintenance_date: timestamp notnull
+    maintenance_mileage: integer notnull
+    cost: decimal:10,2 nullable
+    workshop: string:255 nullable
+    note: text nullable
+    next_maintenance_mileage: integer nullable
+    next_maintenance_date: timestamp nullable
+    # Relaciones
+    belongsTo: Vehicle, MaintenanceType
+
+indexes:
+  - name: idx_request_user_status
+    table: vehicle_request
+    columns: [user_id, request_status_id]
+
+  - name: idx_vehicle_status_fuel
+    table: vehicle
+    columns: [status_id, fuel_type_id]
+
+  - name: idx_maintenance_vehicle_date
+    table: maintenance
+    columns: [vehicle_id, maintenance_date]
+
+  - name: idx_history_request
+    table: vehicle_usage_history
+    columns: [request_id]
+
+  - name: idx_history_evidence
+    table: history_evidence
+    columns: [history_id]
+
+controllers:
+  # ...
