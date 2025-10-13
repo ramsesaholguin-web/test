@@ -11,6 +11,7 @@ use App\Filament\Resources\VehicleStatuses\Schemas\VehicleStatusInfolist;
 use App\Filament\Resources\VehicleStatuses\Tables\VehicleStatusesTable;
 use App\Models\VehicleStatus;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class VehicleStatusResource extends Resource
     protected static ?string $model = VehicleStatus::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'VehicleStatus';
 

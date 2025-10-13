@@ -11,6 +11,7 @@ use App\Filament\Resources\EvidenceTypes\Schemas\EvidenceTypeInfolist;
 use App\Filament\Resources\EvidenceTypes\Tables\EvidenceTypesTable;
 use App\Models\EvidenceType;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class EvidenceTypeResource extends Resource
     protected static ?string $model = EvidenceType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'EvidenceType';
 

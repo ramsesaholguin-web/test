@@ -11,6 +11,7 @@ use App\Filament\Resources\HistoryEvidence\Schemas\HistoryEvidenceInfolist;
 use App\Filament\Resources\HistoryEvidence\Tables\HistoryEvidenceTable;
 use App\Models\HistoryEvidence;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class HistoryEvidenceResource extends Resource
     protected static ?string $model = HistoryEvidence::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'HistoryEvidence';
 

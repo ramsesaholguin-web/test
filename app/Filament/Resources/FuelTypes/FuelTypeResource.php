@@ -11,6 +11,7 @@ use App\Filament\Resources\FuelTypes\Schemas\FuelTypeInfolist;
 use App\Filament\Resources\FuelTypes\Tables\FuelTypesTable;
 use App\Models\FuelType;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class FuelTypeResource extends Resource
     protected static ?string $model = FuelType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'FuelType';
 

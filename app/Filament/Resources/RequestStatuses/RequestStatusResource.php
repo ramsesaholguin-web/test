@@ -11,6 +11,7 @@ use App\Filament\Resources\RequestStatuses\Schemas\RequestStatusInfolist;
 use App\Filament\Resources\RequestStatuses\Tables\RequestStatusesTable;
 use App\Models\RequestStatus;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class RequestStatusResource extends Resource
     protected static ?string $model = RequestStatus::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?string $recordTitleAttribute = 'RequestStatus';
 

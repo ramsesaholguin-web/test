@@ -11,6 +11,7 @@ use App\Filament\Resources\MaintenanceTypes\Schemas\MaintenanceTypeInfolist;
 use App\Filament\Resources\MaintenanceTypes\Tables\MaintenanceTypesTable;
 use App\Models\MaintenanceType;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class MaintenanceTypeResource extends Resource
     protected static ?string $model = MaintenanceType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'MaintenanceType';
 

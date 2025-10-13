@@ -11,6 +11,7 @@ use App\Filament\Resources\VehicleRequests\Schemas\VehicleRequestInfolist;
 use App\Filament\Resources\VehicleRequests\Tables\VehicleRequestsTable;
 use App\Models\VehicleRequest;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class VehicleRequestResource extends Resource
     protected static ?string $model = VehicleRequest::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'VehicleRequest';
 

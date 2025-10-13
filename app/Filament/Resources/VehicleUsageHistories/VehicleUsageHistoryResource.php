@@ -11,6 +11,7 @@ use App\Filament\Resources\VehicleUsageHistories\Schemas\VehicleUsageHistoryInfo
 use App\Filament\Resources\VehicleUsageHistories\Tables\VehicleUsageHistoriesTable;
 use App\Models\VehicleUsageHistory;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class VehicleUsageHistoryResource extends Resource
     protected static ?string $model = VehicleUsageHistory::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     public static function form(Schema $schema): Schema
     {

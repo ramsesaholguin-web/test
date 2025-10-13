@@ -11,6 +11,7 @@ use App\Filament\Resources\UserStatuses\Schemas\UserStatusInfolist;
 use App\Filament\Resources\UserStatuses\Tables\UserStatusesTable;
 use App\Models\UserStatus;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class UserStatusResource extends Resource
     protected static ?string $model = UserStatus::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?string $recordTitleAttribute = 'UserStatus';
 

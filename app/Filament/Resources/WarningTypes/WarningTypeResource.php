@@ -11,6 +11,7 @@ use App\Filament\Resources\WarningTypes\Schemas\WarningTypeInfolist;
 use App\Filament\Resources\WarningTypes\Tables\WarningTypesTable;
 use App\Models\WarningType;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class WarningTypeResource extends Resource
     protected static ?string $model = WarningType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function form(Schema $schema): Schema
     {

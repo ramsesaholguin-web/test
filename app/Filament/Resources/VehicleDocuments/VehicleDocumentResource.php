@@ -11,6 +11,7 @@ use App\Filament\Resources\VehicleDocuments\Schemas\VehicleDocumentInfolist;
 use App\Filament\Resources\VehicleDocuments\Tables\VehicleDocumentsTable;
 use App\Models\VehicleDocument;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class VehicleDocumentResource extends Resource
     protected static ?string $model = VehicleDocument::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'VehicleDocument';
 

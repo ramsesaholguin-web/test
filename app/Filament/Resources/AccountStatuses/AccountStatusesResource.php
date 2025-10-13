@@ -11,6 +11,7 @@ use App\Filament\Resources\AccountStatuses\Schemas\AccountStatusesInfolist;
 use App\Filament\Resources\AccountStatuses\Tables\AccountStatusesTable;
 use App\Models\AccountStatuses;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class AccountStatusesResource extends Resource
     protected static ?string $model = AccountStatuses::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function form(Schema $schema): Schema
     {

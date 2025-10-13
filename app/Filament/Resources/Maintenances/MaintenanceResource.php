@@ -11,6 +11,7 @@ use App\Filament\Resources\Maintenances\Schemas\MaintenanceInfolist;
 use App\Filament\Resources\Maintenances\Tables\MaintenancesTable;
 use App\Models\Maintenance;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +22,8 @@ class MaintenanceResource extends Resource
     protected static ?string $model = Maintenance::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
     protected static ?string $recordTitleAttribute = 'Maintenance';
 
