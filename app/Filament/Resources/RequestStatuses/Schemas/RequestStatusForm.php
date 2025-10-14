@@ -4,6 +4,7 @@ namespace App\Filament\Resources\RequestStatuses\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\Resources\Shared\Schemas\FormTemplate;
 
 class RequestStatusForm
 {
@@ -11,8 +12,12 @@ class RequestStatusForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required(),
+                FormTemplate::groupWithSection([
+                    FormTemplate::basicSection('Request status', [
+                        TextInput::make('name')
+                            ->required(),
+                    ])->columns(2),
+                ]),
             ]);
     }
 }

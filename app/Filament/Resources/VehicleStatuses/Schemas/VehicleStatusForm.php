@@ -4,6 +4,7 @@ namespace App\Filament\Resources\VehicleStatuses\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\Resources\Shared\Schemas\FormTemplate;
 
 class VehicleStatusForm
 {
@@ -11,8 +12,13 @@ class VehicleStatusForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required(),
+                FormTemplate::groupWithSection([
+                    FormTemplate::basicSection('Vehicle status', [
+                        TextInput::make('name')
+                            ->required(),
+                        TextInput::make('color'),
+                    ])->columns(2),
+                ]),
             ]);
     }
 }

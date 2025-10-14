@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use App\Filament\Resources\Shared\Schemas\FormTemplate;
 
 class WarningForm
 {
@@ -14,22 +15,26 @@ class WarningForm
     {
         return $schema
             ->components([
-                Select::make('user_id')
-                    ->relationship('user', 'id')
-                    ->required(),
-                DateTimePicker::make('warning_date')
-                    ->required(),
-                Select::make('warning_type_id')
-                    ->relationship('warningType', 'name')
-                    ->required(),
+                FormTemplate::groupWithSection([
+                    FormTemplate::basicSection('Warning details', [
+                        Select::make('user_id')
+                            ->relationship('user', 'id')
+                            ->required(),
+                        DateTimePicker::make('warning_date')
+                            ->required(),
+                        Select::make('warning_type_id')
+                            ->relationship('warningType', 'name')
+                            ->required(),
+                    ])->columns(2),
+                ]),
                 Textarea::make('description')
                     ->columnSpanFull(),
-                TextInput::make('evidence_url'),
-                TextInput::make('warned_by')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('belongsTo')
-                    ->required(),
+                FormTemplate::basicSection('Additional', [
+                    FormTemplate::labeledText('evidence_url', 'Evidence URL'),
+                    FormTemplate::labeledText('warned_by', 'Warned by', true)
+                        ->numeric(),
+                    FormTemplate::labeledText('belongsTo', 'Owner', true),
+                ])->columns(2),
             ]);
     }
 }

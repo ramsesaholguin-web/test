@@ -4,6 +4,7 @@ namespace App\Filament\Resources\WarningTypes\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\Resources\Shared\Schemas\FormTemplate;
 
 class WarningTypeForm
 {
@@ -11,8 +12,12 @@ class WarningTypeForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required(),
+                FormTemplate::groupWithSection([
+                    FormTemplate::basicSection('Warning type', [
+                        TextInput::make('name')
+                            ->required(),
+                    ])->columns(2),
+                ]),
             ]);
     }
 }

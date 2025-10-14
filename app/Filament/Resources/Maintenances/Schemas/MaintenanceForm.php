@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use App\Filament\Resources\Shared\Schemas\FormTemplate;
 
 class MaintenanceForm
 {
@@ -14,28 +15,31 @@ class MaintenanceForm
     {
         return $schema
             ->components([
-                Select::make('vehicle_id')
-                    ->relationship('vehicle', 'id')
-                    ->required(),
-                Select::make('maintenance_type_id')
-                    ->relationship('maintenanceType', 'name')
-                    ->required(),
-                DateTimePicker::make('maintenance_date')
-                    ->required(),
-                TextInput::make('maintenance_mileage')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('cost')
-                    ->numeric()
-                    ->prefix('$'),
-                TextInput::make('workshop'),
-                Textarea::make('note')
-                    ->columnSpanFull(),
-                TextInput::make('next_maintenance_mileage')
-                    ->numeric(),
-                DateTimePicker::make('next_maintenance_date'),
-                TextInput::make('belongsTo')
-                    ->required(),
+                FormTemplate::groupWithSection([
+                    FormTemplate::basicSection('Maintenance', [
+                        Select::make('vehicle_id')
+                            ->relationship('vehicle', 'id')
+                            ->required(),
+                        Select::make('maintenance_type_id')
+                            ->relationship('maintenanceType', 'name')
+                            ->required(),
+                        DateTimePicker::make('maintenance_date')
+                            ->required(),
+                        TextInput::make('maintenance_mileage')
+                            ->required()
+                            ->numeric(),
+                        TextInput::make('cost')
+                            ->numeric()
+                            ->prefix('$'),
+                        TextInput::make('workshop'),
+                        Textarea::make('note')
+                            ->columnSpanFull(),
+                        TextInput::make('next_maintenance_mileage')
+                            ->numeric(),
+                        DateTimePicker::make('next_maintenance_date'),
+                        FormTemplate::labeledText('belongsTo', 'Owner', true),
+                    ])->columns(2),
+                ]),
             ]);
     }
 }

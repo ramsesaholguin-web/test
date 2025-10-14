@@ -4,6 +4,7 @@ namespace App\Filament\Resources\FuelTypes\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\Resources\Shared\Schemas\FormTemplate;
 
 class FuelTypeForm
 {
@@ -11,8 +12,12 @@ class FuelTypeForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required(),
+                FormTemplate::groupWithSection([
+                    FormTemplate::basicSection('Fuel type', [
+                        TextInput::make('name')
+                            ->required(),
+                    ])->columns(2),
+                ]),
             ]);
     }
 }
