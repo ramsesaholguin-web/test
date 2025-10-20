@@ -11,14 +11,8 @@ class Ordenes extends ChartWidget
     protected function getData(): array
     {
         return [
-            Stats::make('Ordenes por Mes', [
-                'Enero' => 30,
-                'Febrero' => 45,
-                'Marzo' => 25,
-                'Abril' => 60,
-                'Mayo' => 50,
-                'Junio' => 70,
-            ])->color('blue'),
+            Stats::make('Ordenes', 0)
+                ->description('Total de órdenes procesadas'),
         ];
     }
 
