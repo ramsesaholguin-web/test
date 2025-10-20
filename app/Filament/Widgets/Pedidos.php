@@ -2,17 +2,18 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Widgets\ChartWidget;
+use Filament\Widgets\StatsOverviewWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
-class Pedidos extends ChartWidget
+class Pedidos extends StatsOverviewWidget
 {
     protected ?string $heading = 'Pedidos';
 
-    protected function getData(): array
+    protected function getStats(): array
     {
         return [
             Stat::make('Cantidad de Pedidos', 0)
-                -> description('Total de pedidos realizados'),
+                ->description('Total de pedidos realizados'),
         ];
     }
 
