@@ -11,7 +11,7 @@ class Ordenes extends ChartWidget
     protected function getData(): array
     {
         return [
-            Sats::make('Ordenes por Mes', [
+            Stats::make('Ordenes por Mes', [
                 'Enero' => 30,
                 'Febrero' => 45,
                 'Marzo' => 25,
