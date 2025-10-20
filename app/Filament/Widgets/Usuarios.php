@@ -10,7 +10,7 @@ class Usuarios extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Usuarios, Total', 150)
+            Stat::make('Usuarios, Total', 3)
                 ->description('Cantidad de usuarios registrados'),
         ];
     }
