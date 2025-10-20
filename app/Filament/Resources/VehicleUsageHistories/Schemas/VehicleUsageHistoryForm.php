@@ -39,7 +39,7 @@ class VehicleUsageHistoryForm
                             ->columnSpanFull(),
                         FormTemplate::labeledText('belongsTo', 'Owner', true),
                     ])->columns(2),
-                ]),
+                ])->columnSpanFull(),
             ]);
     }
 }

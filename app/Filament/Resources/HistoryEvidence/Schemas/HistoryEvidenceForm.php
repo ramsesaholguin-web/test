@@ -24,8 +24,8 @@ class HistoryEvidenceForm
                         TextInput::make('url')
                             ->required(),
                         FormTemplate::labeledText('belongsTo', 'Owner', true),
-                    ])->columns(2),
-                ]),
+                    ])->columns(2),  
+                ])->columnSpanFull(),
             ]);
     }
 }

@@ -28,12 +28,7 @@ class VehicleRequestForm
                         DateTimePicker::make('requested_return_date')
                             ->required(),
                     ])->columns(2),
-                ]),
-                Textarea::make('description'),                    
-                FormTemplate::basicSection('Trip', [
-                    TextInput::make('destination'),
-                    TextInput::make('event'),
-                ])->columns(2),
+                ]),                              
                 FormTemplate::basicSection('Approval', [
                     Select::make('request_status_id')
                         ->relationship('requestStatus', 'name')
@@ -44,6 +39,11 @@ class VehicleRequestForm
                     Textarea::make('approval_note')
                         ->columnSpanFull(),
                 ])->columns(2),
+                FormTemplate::basicSection('Trip', [
+                    TextInput::make('destination'),
+                    TextInput::make('event'),
+                ])->columns(2),
+                Textarea::make('description'),   
                 DateTimePicker::make('creation_date')
                     ->required(),
                 FormTemplate::labeledText('belongsTo', 'Owner', true),
