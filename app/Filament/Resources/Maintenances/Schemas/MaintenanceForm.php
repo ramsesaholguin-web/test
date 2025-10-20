@@ -39,7 +39,7 @@ class MaintenanceForm
                         DateTimePicker::make('next_maintenance_date'),
                         FormTemplate::labeledText('belongsTo', 'Owner', true),
                     ])->columns(2),
-                ]),
+                ])->columnSpanFull(),
             ]);
     }
 }

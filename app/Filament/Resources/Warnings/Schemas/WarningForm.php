@@ -27,14 +27,14 @@ class WarningForm
                             ->required(),
                     ])->columns(2),
                 ]),
-                Textarea::make('description')
-                    ->columnSpanFull(),
                 FormTemplate::basicSection('Additional', [
                     FormTemplate::labeledText('evidence_url', 'Evidence URL'),
                     FormTemplate::labeledText('warned_by', 'Warned by', true)
                         ->numeric(),
                     FormTemplate::labeledText('belongsTo', 'Owner', true),
                 ])->columns(2),
+                Textarea::make('description')
+                    ->columnSpanFull(),                
             ]);
     }
 }

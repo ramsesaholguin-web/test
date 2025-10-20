@@ -21,7 +21,7 @@ class HistoryEvidenceResource extends Resource
 {
     protected static ?string $model = HistoryEvidence::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 

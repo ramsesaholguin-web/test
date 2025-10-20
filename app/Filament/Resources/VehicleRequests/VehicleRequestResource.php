@@ -21,7 +21,7 @@ class VehicleRequestResource extends Resource
 {
     protected static ?string $model = VehicleRequest::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-check';
 
     protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 

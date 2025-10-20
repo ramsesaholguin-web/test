@@ -21,7 +21,7 @@ class WarningResource extends Resource
 {
     protected static ?string $model = Warning::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shield-exclamation';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 

@@ -21,7 +21,7 @@ class MaintenanceResource extends Resource
 {
     protected static ?string $model = Maintenance::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-wrench-screwdriver';
 
     protected static UnitEnum|string|null $navigationGroup = 'Vehicles';
 
