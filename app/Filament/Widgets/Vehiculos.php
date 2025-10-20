@@ -5,13 +5,13 @@ namespace App\Filament\Widgets;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-class Usuarios extends StatsOverviewWidget
+class Vehiculos extends StatsOverviewWidget
 {
     protected function getStats(): array
     {
         return [
-            Stat::make('Usuarios, Total', 150)
-                ->description('Cantidad de usuarios registrados'),
+            Stat::make('Cantidad de Vehículos', 0)
+                ->description('Total de vehículos registrados en el sistema'),
         ];
     }
 }
