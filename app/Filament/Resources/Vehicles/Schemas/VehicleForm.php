@@ -21,11 +21,11 @@ class VehicleForm
                     ->schema([
                         Section::make('Basic Information')
                             ->schema([
-                                TextInput::make('Brand')
+                                TextInput::make('brand')
                                     ->required(),
-                                TextInput::make('Model')
+                                TextInput::make('model')
                                     ->required(),
-                                TextInput::make('Year')
+                                TextInput::make('year')
                                     ->required()
                                     ->numeric()
                                     ->maxLength(4),
@@ -39,7 +39,7 @@ class VehicleForm
                                 TextInput::make('vin')
                                     ->required()
                                     ->maxLength(17),
-                                TextInput::make('license_plate')
+                                TextInput::make('plate')
                                     ->required()
                                     ->maxLength(10),
                             ])

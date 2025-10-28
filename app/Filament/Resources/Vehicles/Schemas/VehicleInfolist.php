@@ -18,11 +18,16 @@ class VehicleInfolist
                 TextEntry::make('plate'),
                 TextEntry::make('vin'),
                 TextEntry::make('fuelType.name')
-                    ->numeric(),
+                    ->label('Fuel Type')
+                    ->badge()
+                    ->color('info'),
                 TextEntry::make('current_mileage')
-                    ->numeric(),
+                    ->numeric()
+                    ->suffix(' km'),
                 TextEntry::make('status.name')
-                    ->numeric(),
+                    ->label('Vehicle Status')
+                    ->badge()
+                    ->color('success'),
                 TextEntry::make('current_location'),
                 TextEntry::make('registration_date')
                     ->dateTime(),

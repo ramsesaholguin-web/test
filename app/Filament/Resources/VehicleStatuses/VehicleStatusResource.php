@@ -27,6 +27,11 @@ class VehicleStatusResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'VehicleStatus';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return VehicleStatusForm::configure($schema);

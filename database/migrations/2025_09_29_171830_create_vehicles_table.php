@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('vin', 50)->unique();
             $table->foreignId('fuel_type_id')->constrained();
             $table->integer('current_mileage');
-            $table->foreignId('status_id')->constrained('vehicle_status');
+            $table->foreignId('status_id')->constrained('vehicle_statuses');
             $table->string('current_location', 255)->nullable();
             $table->text('note')->nullable();
             $table->timestamp('registration_date')->useCurrent();

@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Filament\Resources\Vehicles\RelationManagers;
+
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
+
+class VehicleDocumentsRelationManager extends RelationManager
+{
+    protected static string $relationship = 'vehicleDocuments';
+
+    protected static ?string $recordTitleAttribute = 'document_name';
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                Schema\TextInput::make('document_name')
+                    ->label('Document Name')
+                    ->required()
+                    ->maxLength(255),
+                Schema\FileUpload::make('file_path')
+                    ->label('File')
+                    ->directory('vehicle-documents')
+                    ->downloadable()
+                    ->openable()
+                    ->acceptedFileTypes(['pdf', 'jpg', 'jpeg', 'png']),
+                Schema\DatePicker::make('expiration_date')
+                    ->label('Expiration Date'),
+            ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->recordTitleAttribute('document_name')
+            ->columns([
+                TextColumn::make('document_name')
+                    ->label('Document Name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('expiration_date')
+                    ->label('Expiration Date')
+                    ->date('d/m/Y')
+                    ->sortable(),
+                TextColumn::make('upload_date')
+                    ->label('Upload Date')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->headerActions([
+                CreateAction::make(),
+            ])
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}
+

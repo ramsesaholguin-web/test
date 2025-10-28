@@ -27,6 +27,11 @@ class EvidenceTypeResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'EvidenceType';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return EvidenceTypeForm::configure($schema);

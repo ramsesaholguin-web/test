@@ -6,6 +6,9 @@ use App\Filament\Resources\Vehicles\Pages\CreateVehicle;
 use App\Filament\Resources\Vehicles\Pages\EditVehicle;
 use App\Filament\Resources\Vehicles\Pages\ListVehicles;
 use App\Filament\Resources\Vehicles\Pages\ViewVehicle;
+use App\Filament\Resources\Vehicles\RelationManagers\MaintenancesRelationManager;
+use App\Filament\Resources\Vehicles\RelationManagers\VehicleDocumentsRelationManager;
+use App\Filament\Resources\Vehicles\RelationManagers\VehicleRequestsRelationManager;
 use App\Filament\Resources\Vehicles\Schemas\VehicleForm;
 use App\Filament\Resources\Vehicles\Schemas\VehicleInfolist;
 use App\Filament\Resources\Vehicles\Tables\VehiclesTable;
@@ -45,7 +48,9 @@ class VehicleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            MaintenancesRelationManager::class,
+            VehicleDocumentsRelationManager::class,
+            VehicleRequestsRelationManager::class,
         ];
     }
 

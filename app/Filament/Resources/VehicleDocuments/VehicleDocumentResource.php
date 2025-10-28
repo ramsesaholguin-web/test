@@ -27,6 +27,11 @@ class VehicleDocumentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'VehicleDocument';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return VehicleDocumentForm::configure($schema);

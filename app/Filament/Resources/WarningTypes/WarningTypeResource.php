@@ -25,6 +25,11 @@ class WarningTypeResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return WarningTypeForm::configure($schema);

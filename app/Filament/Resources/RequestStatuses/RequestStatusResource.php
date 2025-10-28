@@ -27,6 +27,11 @@ class RequestStatusResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'RequestStatus';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return RequestStatusForm::configure($schema);

@@ -27,6 +27,11 @@ class HistoryEvidenceResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'HistoryEvidence';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return HistoryEvidenceForm::configure($schema);

@@ -27,6 +27,11 @@ class MaintenanceTypeResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'MaintenanceType';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return MaintenanceTypeForm::configure($schema);

@@ -27,6 +27,11 @@ class UserStatusResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'UserStatus';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return UserStatusForm::configure($schema);

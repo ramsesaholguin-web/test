@@ -27,6 +27,11 @@ class FuelTypeResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'FuelType';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return FuelTypeForm::configure($schema);
