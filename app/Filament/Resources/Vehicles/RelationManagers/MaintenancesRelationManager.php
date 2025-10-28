@@ -4,6 +4,10 @@ namespace App\Filament\Resources\Vehicles\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Table;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
@@ -82,7 +86,43 @@ class MaintenancesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label('Create Maintenance')
+                    ->form([
+                        Select::make('maintenance_type_id')
+                            ->label('Maintenance Type')
+                            ->relationship('maintenanceType', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        DatePicker::make('maintenance_date')
+                            ->label('Maintenance Date')
+                            ->required(),
+                        TextInput::make('maintenance_mileage')
+                            ->label('Mileage')
+                            ->numeric()
+                            ->suffix('km'),
+                        TextInput::make('cost')
+                            ->label('Cost')
+                            ->numeric()
+                            ->prefix('$'),
+                        TextInput::make('workshop')
+                            ->label('Workshop'),
+                        TextInput::make('next_maintenance_mileage')
+                            ->label('Next Maintenance Mileage')
+                            ->numeric()
+                            ->suffix('km'),
+                        DatePicker::make('next_maintenance_date')
+                            ->label('Next Maintenance Date'),
+                        Textarea::make('note')
+                            ->label('Note')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->using(function (array $data): \App\Models\Maintenance {
+                        $data['vehicle_id'] = $this->ownerRecord->id;
+                        return \App\Models\Maintenance::create($data);
+                    }),
             ])
             ->actions([
                 EditAction::make(),

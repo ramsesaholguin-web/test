@@ -3,6 +3,10 @@
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Table;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
@@ -68,7 +72,31 @@ class WarningsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label('Create Warning')
+                    ->form([
+                        Select::make('warning_type_id')
+                            ->label('Warning Type')
+                            ->relationship('warningType', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        DatePicker::make('warning_date')
+                            ->label('Warning Date')
+                            ->required(),
+                        Textarea::make('description')
+                            ->label('Description')
+                            ->required()
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        TextInput::make('evidence_url')
+                            ->label('Evidence URL')
+                            ->url(),
+                    ])
+                    ->using(function (array $data): \App\Models\Warning {
+                        $data['user_id'] = $this->ownerRecord->id;
+                        return \App\Models\Warning::create($data);
+                    }),
             ])
             ->actions([
                 EditAction::make(),

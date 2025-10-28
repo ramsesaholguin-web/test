@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('file_path', 255);
             $table->date('expiration_date')->nullable();
             $table->timestamp('upload_date')->useCurrent();
-            $table->foreignId('uploaded_by')->constrained('user');
+            $table->foreignId('uploaded_by')->constrained('users');
             $table->string('belongsTo');
             $table->timestamps();
         });

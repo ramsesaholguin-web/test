@@ -4,6 +4,10 @@ namespace App\Filament\Resources\Vehicles\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Table;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
@@ -80,7 +84,40 @@ class VehicleRequestsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label('Create Vehicle Request')
+                    ->form([
+                        Select::make('user_id')
+                            ->label('User')
+                            ->relationship('user', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        DatePicker::make('requested_departure_date')
+                            ->label('Departure Date')
+                            ->required(),
+                        DatePicker::make('requested_return_date')
+                            ->label('Return Date')
+                            ->required(),
+                        Textarea::make('description')
+                            ->label('Description')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        TextInput::make('destination')
+                            ->label('Destination'),
+                        TextInput::make('event')
+                            ->label('Event'),
+                        Select::make('request_status_id')
+                            ->label('Status')
+                            ->relationship('requestStatus', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                    ])
+                    ->using(function (array $data): \App\Models\VehicleRequest {
+                        $data['vehicle_id'] = $this->ownerRecord->id;
+                        return \App\Models\VehicleRequest::create($data);
+                    }),
             ])
             ->actions([
                 EditAction::make(),

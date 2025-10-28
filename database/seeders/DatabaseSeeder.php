@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             VehicleStatusSeeder::class,
             FuelTypeSeeder::class,
+            MaintenanceTypeSeeder::class,
+            RequestStatusSeeder::class,
         ]);
     }
 }

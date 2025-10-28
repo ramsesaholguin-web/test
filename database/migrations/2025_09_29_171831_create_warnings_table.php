@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('warning_type_id')->constrained();
             $table->text('description')->nullable();
             $table->string('evidence_url', 255)->nullable();
-            $table->foreignId('warned_by')->constrained('user');
+            $table->foreignId('warned_by')->constrained('users');
             $table->string('belongsTo');
             $table->timestamps();
         });

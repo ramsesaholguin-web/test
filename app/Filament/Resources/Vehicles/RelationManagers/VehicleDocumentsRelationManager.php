@@ -4,6 +4,9 @@ namespace App\Filament\Resources\Vehicles\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Table;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
@@ -59,7 +62,27 @@ class VehicleDocumentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label('Create Document')
+                    ->form([
+                        TextInput::make('document_name')
+                            ->label('Document Name')
+                            ->required()
+                            ->maxLength(255),
+                        FileUpload::make('file_path')
+                            ->label('File')
+                            ->directory('vehicle-documents')
+                            ->downloadable()
+                            ->openable()
+                            ->acceptedFileTypes(['pdf', 'jpg', 'jpeg', 'png']),
+                        DatePicker::make('expiration_date')
+                            ->label('Expiration Date'),
+                    ])
+                    ->using(function (array $data): \App\Models\VehicleDocument {
+                        $data['vehicle_id'] = $this->ownerRecord->id;
+                        $data['upload_date'] = now();
+                        return \App\Models\VehicleDocument::create($data);
+                    }),
             ])
             ->actions([
                 EditAction::make(),
