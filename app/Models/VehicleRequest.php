@@ -43,12 +43,12 @@ class VehicleRequest extends Model
             'id' => 'integer',
             'user_id' => 'integer',
             'vehicle_id' => 'integer',
-            'requested_departure_date' => 'timestamp',
-            'requested_return_date' => 'timestamp',
+            'requested_departure_date' => 'datetime',
+            'requested_return_date' => 'datetime',
             'request_status_id' => 'integer',
-            'approval_date' => 'timestamp',
+            'approval_date' => 'datetime',
             'approved_by' => 'integer',
-            'creation_date' => 'timestamp',
+            'creation_date' => 'datetime',
         ];
     }
 

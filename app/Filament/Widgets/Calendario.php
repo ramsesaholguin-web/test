@@ -40,7 +40,7 @@ class Calendario extends CalendarWidget
             ->get()
             ->map(function (VehicleRequest $request) {
                 return CalendarEvent::make()
-                    ->id($request->id)
+                    ->key($request->id)
                     ->title($request->event ?? 'Solicitud #' . $request->id)
                     ->start($request->requested_departure_date)
                     ->end($request->requested_return_date)
