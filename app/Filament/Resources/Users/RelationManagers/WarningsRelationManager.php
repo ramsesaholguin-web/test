@@ -52,7 +52,7 @@ class WarningsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('description')
             ->columns([
-                TextColumn::make('warning_type.name')
+                TextColumn::make('warningType.name')
                     ->label('Type')
                     ->searchable()
                     ->sortable(),
