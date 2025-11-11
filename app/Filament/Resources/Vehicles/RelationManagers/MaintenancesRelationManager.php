@@ -37,6 +37,7 @@ class MaintenancesRelationManager extends RelationManager
                     ->required(),
                 Schema\TextInput::make('maintenance_mileage')
                     ->label('Mileage')
+                    ->required()
                     ->numeric()
                     ->suffix('km'),
                 Schema\TextInput::make('cost')
@@ -100,6 +101,7 @@ class MaintenancesRelationManager extends RelationManager
                             ->required(),
                         TextInput::make('maintenance_mileage')
                             ->label('Mileage')
+                            ->required()
                             ->numeric()
                             ->suffix('km'),
                         TextInput::make('cost')
@@ -121,6 +123,10 @@ class MaintenancesRelationManager extends RelationManager
                     ])
                     ->using(function (array $data): \App\Models\Maintenance {
                         $data['vehicle_id'] = $this->ownerRecord->id;
+                        // Set belongsTo if not provided
+                        if (!isset($data['belongsTo']) || empty($data['belongsTo'])) {
+                            $data['belongsTo'] = auth()->user()->name ?? 'System';
+                        }
                         return \App\Models\Maintenance::create($data);
                     }),
             ])

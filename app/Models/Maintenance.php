@@ -39,9 +39,9 @@ class Maintenance extends Model
             'id' => 'integer',
             'vehicle_id' => 'integer',
             'maintenance_type_id' => 'integer',
-            'maintenance_date' => 'timestamp',
+            'maintenance_date' => 'datetime',
             'cost' => 'decimal:2',
-            'next_maintenance_date' => 'timestamp',
+            'next_maintenance_date' => 'datetime',
         ];
     }
 

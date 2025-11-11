@@ -17,6 +17,7 @@ class MantenimientosProximosVehiculos extends BaseWidget
             ->query(
                 Maintenance::query()
                     ->with(['vehicle', 'maintenanceType'])
+                    ->whereNotNull('next_maintenance_date')
                     ->where('next_maintenance_date', '>=', now())
                     ->where('next_maintenance_date', '<=', now()->addDays(30))
                     ->orderBy('next_maintenance_date', 'asc')

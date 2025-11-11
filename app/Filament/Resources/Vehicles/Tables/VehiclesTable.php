@@ -27,13 +27,40 @@ class VehiclesTable
                 TextColumn::make('vin')
                     ->searchable(),
                 TextColumn::make('fuelType.name')
-                    ->numeric()
+                    ->label('Tipo de Combustible')
+                    ->badge()
                     ->sortable(),
                 TextColumn::make('current_mileage')
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('maintenances_count')
+                    ->label('Mantenimientos')
+                    ->counts('maintenances')
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+                TextColumn::make('last_maintenance_date')
+                    ->label('Último Mantenimiento')
+                    ->state(function ($record) {
+                        $lastMaintenance = $record->maintenances()->latest('maintenance_date')->first();
+                        if (!$lastMaintenance || !$lastMaintenance->maintenance_date) {
+                            return 'N/A';
+                        }
+                        
+                        // Con el cast 'datetime', maintenance_date ya es una instancia de Carbon
+                        return $lastMaintenance->maintenance_date->format('d/m/Y');
+                    })
+                    ->sortable(query: function ($query, string $direction) {
+                        return $query->orderByRaw("(
+                            SELECT MAX(maintenance_date) 
+                            FROM maintenances 
+                            WHERE vehicle_id = vehicles.id
+                        ) {$direction}");
+                    })
+                    ->toggleable(),
                 TextColumn::make('status.name')
-                    ->numeric()
+                    ->label('Estado')
+                    ->badge()
                     ->sortable(),
                 TextColumn::make('current_location')
                     ->searchable(),

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Vehicles\Widgets;
 
 use App\Models\Vehicle;
 use App\Models\VehicleRequest;
+use App\Models\Maintenance;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -31,6 +32,15 @@ class VehiculosStats extends StatsOverviewWidget
                   });
         })->count();
 
+        // Total de mantenimientos
+        $totalMantenimientos = Maintenance::count();
+        
+        // Mantenimientos pendientes (próximos 30 días)
+        $mantenimientosPendientes = Maintenance::whereNotNull('next_maintenance_date')
+            ->where('next_maintenance_date', '>=', now())
+            ->where('next_maintenance_date', '<=', now()->addDays(30))
+            ->count();
+
         return [
             Stat::make('Total de Vehículos', $totalVehiculos)
                 ->description('Vehículos registrados en el sistema')
@@ -49,6 +59,18 @@ class VehiculosStats extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-o-clock')
                 ->color('warning')
                 ->icon('heroicon-o-clock'),
+            
+            Stat::make('Total Mantenimientos', $totalMantenimientos)
+                ->description('Mantenimientos registrados')
+                ->descriptionIcon('heroicon-o-wrench-screwdriver')
+                ->color('info')
+                ->icon('heroicon-o-wrench-screwdriver'),
+            
+            Stat::make('Mantenimientos Pendientes', $mantenimientosPendientes)
+                ->description('Próximos 30 días')
+                ->descriptionIcon('heroicon-o-calendar')
+                ->color($mantenimientosPendientes > 0 ? 'warning' : 'success')
+                ->icon('heroicon-o-calendar'),
         ];
     }
 }

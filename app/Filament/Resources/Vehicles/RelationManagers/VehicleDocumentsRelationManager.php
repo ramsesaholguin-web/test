@@ -74,13 +74,22 @@ class VehicleDocumentsRelationManager extends RelationManager
                             ->directory('vehicle-documents')
                             ->downloadable()
                             ->openable()
-                            ->acceptedFileTypes(['pdf', 'jpg', 'jpeg', 'png']),
+                            ->acceptedFileTypes(['pdf', 'jpg', 'jpeg', 'png'])
+                            ->required(),
                         DatePicker::make('expiration_date')
                             ->label('Expiration Date'),
                     ])
                     ->using(function (array $data): \App\Models\VehicleDocument {
                         $data['vehicle_id'] = $this->ownerRecord->id;
                         $data['upload_date'] = now();
+                        // Set uploaded_by to current user
+                        if (!isset($data['uploaded_by']) || empty($data['uploaded_by'])) {
+                            $data['uploaded_by'] = auth()->id();
+                        }
+                        // Set belongsTo if not provided
+                        if (!isset($data['belongsTo']) || empty($data['belongsTo'])) {
+                            $data['belongsTo'] = auth()->user()->name ?? 'System';
+                        }
                         return \App\Models\VehicleDocument::create($data);
                     }),
             ])

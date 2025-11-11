@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\Shared\Schemas\FormTemplate;
+use App\Models\Vehicle;
 
 class MaintenanceForm
 {
@@ -18,7 +19,20 @@ class MaintenanceForm
                 FormTemplate::groupWithSection([
                     FormTemplate::basicSection('Maintenance', [
                         Select::make('vehicle_id')
-                            ->relationship('vehicle', 'id')
+                            ->label('Vehicle')
+                            ->options(function () {
+                                return Vehicle::orderBy('plate')
+                                    ->get()
+                                    ->mapWithKeys(function (Vehicle $vehicle) {
+                                        $label = "{$vehicle->plate} - {$vehicle->brand} {$vehicle->model}";
+                                        if ($vehicle->year) {
+                                            $label .= " ({$vehicle->year})";
+                                        }
+                                        return [$vehicle->id => $label];
+                                    })
+                                    ->toArray();
+                            })
+                            ->searchable()
                             ->required(),
                         Select::make('maintenance_type_id')
                             ->relationship('maintenanceType', 'name')

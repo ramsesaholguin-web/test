@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             FuelTypeSeeder::class,
             MaintenanceTypeSeeder::class,
             RequestStatusSeeder::class,
+            VehicleSeeder::class,
         ]);
     }
 }
