@@ -28,10 +28,17 @@ class WarningForm
                     ])->columns(2),
                 ]),
                 FormTemplate::basicSection('Additional', [
+                    Select::make('warned_by')
+                        ->label('Warned By')
+                        ->relationship('warnedBy', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->default(fn () => auth()->id())
+                        ->helperText('User who created this warning'),
+                    
                     FormTemplate::labeledText('evidence_url', 'Evidence URL'),
-                    FormTemplate::labeledText('warned_by', 'Warned by', true)
-                        ->numeric(),
-                    FormTemplate::labeledText('belongsTo', 'Owner', true),
+                    FormTemplate::labeledText('belongsTo', 'Owner', true)
+                        ->default('Admin'),
                 ])->columns(2),
                 Textarea::make('description')
                     ->columnSpanFull(),                

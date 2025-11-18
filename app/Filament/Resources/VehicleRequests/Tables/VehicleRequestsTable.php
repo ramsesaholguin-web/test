@@ -3,10 +3,14 @@
 namespace App\Filament\Resources\VehicleRequests\Tables;
 
 use App\Models\RequestStatus;
+use App\Models\VehicleRequest;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -117,9 +121,133 @@ class VehicleRequestsTable
                     ->relationship('vehicle', 'plate')
                     ->searchable()
                     ->preload(),
+                
+                // Filtro por Usuario (para que usuarios normales vean solo sus solicitudes)
+                SelectFilter::make('user_id')
+                    ->label('User')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload(),
             ])
             ->recordActions([
                 ViewAction::make(),
+                
+                // Acción para Aprobar Solicitud
+                Action::make('approve')
+                    ->label('Approve')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Approve Vehicle Request')
+                    ->modalDescription(fn ($record) => "Are you sure you want to approve the request from " . ($record->user->name ?? 'user') . " for vehicle " . ($record->vehicle->plate ?? 'N/A') . "?")
+                    ->form([
+                        Textarea::make('approval_note')
+                            ->label('Approval Note (Optional)')
+                            ->placeholder('Add a note about this approval...')
+                            ->rows(3)
+                            ->maxLength(500),
+                    ])
+                    ->action(function (VehicleRequest $record, array $data) {
+                        // Obtener estados
+                        $approvedStatus = RequestStatus::where('name', 'Approved')->first();
+                        $pendingStatus = RequestStatus::where('name', 'Pending')->first();
+                        
+                        // Validar que la solicitud esté pendiente
+                        if (!$pendingStatus || $record->request_status_id !== $pendingStatus->id) {
+                            Notification::make()
+                                ->title('Error')
+                                ->body('This request cannot be approved. It must be in "Pending" status.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                        
+                        // Verificar disponibilidad del vehículo antes de aprobar
+                        if (!$record->vehicle->isAvailableForDates(
+                            $record->requested_departure_date,
+                            $record->requested_return_date,
+                            $record->id // Excluir esta solicitud del chequeo
+                        )) {
+                            Notification::make()
+                                ->title('Vehicle Not Available')
+                                ->body('The vehicle is no longer available for the selected dates. Please check availability before approving.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                        
+                        // Actualizar solicitud
+                        $record->update([
+                            'request_status_id' => $approvedStatus->id,
+                            'approval_date' => now(),
+                            'approved_by' => auth()->id(),
+                            'approval_note' => $data['approval_note'] ?? null,
+                        ]);
+                        
+                        Notification::make()
+                            ->title('Request Approved')
+                            ->body("The vehicle request has been approved successfully.")
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(function ($record) {
+                        if (!$record) return false;
+                        $pendingStatus = RequestStatus::where('name', 'Pending')->first();
+                        return $pendingStatus && $record->request_status_id === $pendingStatus->id;
+                    }),
+                
+                // Acción para Rechazar Solicitud
+                Action::make('reject')
+                    ->label('Reject')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Reject Vehicle Request')
+                    ->modalDescription(fn ($record) => "Are you sure you want to reject the request from " . ($record->user->name ?? 'user') . " for vehicle " . ($record->vehicle->plate ?? 'N/A') . "?")
+                    ->form([
+                        Textarea::make('approval_note')
+                            ->label('Rejection Reason')
+                            ->placeholder('Please provide a reason for rejecting this request...')
+                            ->required()
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->helperText('A reason is required when rejecting a request.'),
+                    ])
+                    ->action(function (VehicleRequest $record, array $data) {
+                        // Obtener estados
+                        $rejectedStatus = RequestStatus::where('name', 'Rejected')->first();
+                        $pendingStatus = RequestStatus::where('name', 'Pending')->first();
+                        
+                        // Validar que la solicitud esté pendiente
+                        if (!$pendingStatus || $record->request_status_id !== $pendingStatus->id) {
+                            Notification::make()
+                                ->title('Error')
+                                ->body('This request cannot be rejected. It must be in "Pending" status.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                        
+                        // Actualizar solicitud
+                        $record->update([
+                            'request_status_id' => $rejectedStatus->id,
+                            'approval_date' => now(),
+                            'approved_by' => auth()->id(),
+                            'approval_note' => $data['approval_note'],
+                        ]);
+                        
+                        Notification::make()
+                            ->title('Request Rejected')
+                            ->body("The vehicle request has been rejected. The reason has been saved.")
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(function ($record) {
+                        if (!$record) return false;
+                        $pendingStatus = RequestStatus::where('name', 'Pending')->first();
+                        return $pendingStatus && $record->request_status_id === $pendingStatus->id;
+                    }),
+                
                 EditAction::make()
                     ->visible(fn ($record) => $record && $record->user_id === auth()->id()), // Solo puede editar sus propias solicitudes
             ])

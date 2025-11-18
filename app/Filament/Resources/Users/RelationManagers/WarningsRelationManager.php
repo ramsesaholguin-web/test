@@ -95,6 +95,8 @@ class WarningsRelationManager extends RelationManager
                     ])
                     ->using(function (array $data): \App\Models\Warning {
                         $data['user_id'] = $this->ownerRecord->id;
+                        $data['warned_by'] = auth()->id(); // Usuario autenticado que crea la advertencia
+                        $data['belongsTo'] = $data['belongsTo'] ?? 'Admin'; // Valor por defecto si no se proporciona
                         return \App\Models\Warning::create($data);
                     }),
             ])

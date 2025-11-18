@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('event', 255)->nullable();
             $table->foreignId('request_status_id')->constrained();
             $table->timestamp('approval_date')->nullable();
-            $table->foreignId('approved_by')->nullable()->constrained('user');
+            $table->foreignId('approved_by')->nullable()->constrained('users');
             $table->text('approval_note')->nullable();
             $table->timestamp('creation_date')->useCurrent();
             $table->string('belongsTo');

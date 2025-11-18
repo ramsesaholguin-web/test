@@ -24,21 +24,16 @@ class EditVehicleRequest extends EditRecord
     }
 
     /**
-     * Verificar que el usuario solo pueda editar sus propias solicitudes
-     * Esto es parte de la Fase 4: Vista de Usuario
-     * 
-     * Este método se ejecuta cuando se carga la página de edición
+     * Permitir que todos los usuarios vean todas las solicitudes
+     * Los usuarios normales pueden editar solo sus propias solicitudes
+     * Los administradores pueden editar cualquier solicitud
+     * La restricción de edición se maneja en la tabla con ->visible()
      */
     public function mount(int | string $record): void
     {
         parent::mount($record);
-        
-        // Verificar que el usuario solo pueda editar sus propias solicitudes
-        // Si necesitas que los administradores puedan editar todas las solicitudes,
-        // puedes agregar una verificación de rol aquí
-        if ($this->record->user_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para editar esta solicitud.');
-        }
+        // Ya no restringimos el acceso aquí
+        // La restricción de edición se maneja en la tabla con ->visible()
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

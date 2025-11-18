@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\VehicleRequests\Pages;
 
 use App\Filament\Resources\VehicleRequests\VehicleRequestResource;
+use App\Filament\Resources\VehicleRequests\Widgets\VehicleRequestsStats;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,19 +19,22 @@ class ListVehicleRequests extends ListRecords
         ];
     }
 
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            VehicleRequestsStats::class,
+        ];
+    }
+
     /**
-     * Modificar la consulta para filtrar solo las solicitudes del usuario autenticado
-     * Esto es parte de la Fase 4: Vista de Usuario
-     * 
-     * Por ahora, todos los usuarios solo ven sus propias solicitudes.
-     * Si necesitas que los administradores vean todas las solicitudes,
-     * puedes agregar una verificación de rol aquí.
+     * Modificar la consulta para mostrar todas las solicitudes
+     * Los usuarios normales pueden filtrar por sus propias solicitudes usando el filtro de usuario
+     * Los administradores pueden ver todas las solicitudes para aprobar/rechazar
      */
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()
-            ->where('user_id', auth()->id())
-            ->with(['vehicle', 'requestStatus', 'user']); // Cargar relaciones para mejor rendimiento
+            ->with(['vehicle', 'requestStatus', 'user', 'approvedBy']); // Cargar relaciones para mejor rendimiento
     }
 
     /**

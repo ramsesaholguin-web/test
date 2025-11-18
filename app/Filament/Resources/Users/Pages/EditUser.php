@@ -18,4 +18,18 @@ class EditUser extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    /**
+     * Mutate form data before saving
+     * Remove password from data if it's empty (to keep current password)
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Si el password está vacío, no lo actualizamos
+        if (empty($data['password'])) {
+            unset($data['password']);
+        }
+
+        return $data;
+    }
 }
