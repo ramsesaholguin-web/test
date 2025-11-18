@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Maintenances\Pages;
 
 use App\Filament\Resources\Maintenances\MaintenanceResource;
+use App\Filament\Resources\Maintenances\Widgets\MaintenancesStats;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -14,6 +15,13 @@ class ListMaintenances extends ListRecords
     {
         return [
             CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            MaintenancesStats::class,
         ];
     }
 }
