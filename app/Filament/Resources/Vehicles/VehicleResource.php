@@ -30,6 +30,11 @@ class VehicleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Vehicle';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_any_vehicle_resource') ?? false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return VehicleForm::configure($schema);

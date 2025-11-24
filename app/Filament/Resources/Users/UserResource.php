@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Auth\Access\Authorizable;
 
 class UserResource extends Resource
 {
@@ -25,6 +26,11 @@ class UserResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_any_user_resource') ?? false;
+    }
 
     public static function form(Schema $schema): Schema
     {

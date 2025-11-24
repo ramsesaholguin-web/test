@@ -27,14 +27,21 @@ class ListVehicleRequests extends ListRecords
     }
 
     /**
-     * Modificar la consulta para mostrar todas las solicitudes
-     * Los usuarios normales pueden filtrar por sus propias solicitudes usando el filtro de usuario
+     * Modificar la consulta para filtrar por usuario si no es admin
+     * Los usuarios normales solo ven sus propias solicitudes
      * Los administradores pueden ver todas las solicitudes para aprobar/rechazar
      */
     protected function getTableQuery(): Builder
     {
-        return parent::getTableQuery()
+        $query = parent::getTableQuery()
             ->with(['vehicle', 'requestStatus', 'user', 'approvedBy']); // Cargar relaciones para mejor rendimiento
+        
+        // Si el usuario no es admin, filtrar solo sus solicitudes
+        if (!auth()->user()?->hasRole('admin')) {
+            $query->where('user_id', auth()->id());
+        }
+        
+        return $query;
     }
 
     /**

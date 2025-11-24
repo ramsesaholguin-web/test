@@ -1,764 +1,405 @@
-# Sistema de Gestión de Solicitudes de Vehículos
+# Sistema de Gestión de Flotilla de Vehículos
 
-Sistema completo para la gestión de solicitudes de uso de vehículos, desarrollado con Laravel y Filament. Permite a los usuarios solicitar vehículos disponibles, seleccionando fechas y vehículos, con un proceso de aprobación/rechazo por parte de administradores.
-
----
-
-## 📋 Resumen Ejecutivo
-
-### Objetivo del Sistema
-Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, seleccionando fechas y vehículos disponibles, con un proceso de aprobación/rechazo por parte de administradores.
-
-### Componentes Principales
-1. **Interfaz de Usuario**: Formulario de solicitud con calendario y selector de vehículos
-2. **Sistema de Validación**: Verificar disponibilidad de vehículos en fechas seleccionadas
-3. **Panel de Administración**: Vista para aprobar/rechazar solicitudes
-4. **Indicadores Visuales**: Mostrar disponibilidad de vehículos en tiempo real
-
-### Flujo Principal
-1. Usuario selecciona fechas
-2. Sistema muestra vehículos disponibles
-3. Usuario selecciona vehículo y completa datos
-4. Sistema valida y crea solicitud con estado "Pendiente"
-5. Administrador aprueba o rechaza
-6. Sistema actualiza estado y notifica (opcional)
-
-### Validaciones Críticas
-1. Fechas válidas (retorno > salida, no pasadas)
-2. Vehículo disponible en el rango de fechas
-3. No solapamiento con solicitudes aprobadas
-4. Estado del vehículo es "Disponible"
-
-### Estados del Sistema
-1. **Pendiente**: Estado inicial, esperando aprobación
-2. **Aprobada**: Solicitud aprobada, vehículo ocupado
-3. **Rechazada**: Solicitud rechazada, con motivo
+Sistema completo desarrollado en Laravel con Filament para la gestión integral de una flotilla de vehículos. El sistema permite administrar vehículos, solicitudes de uso, mantenimientos, advertencias a usuarios, documentos y historial de uso.
 
 ---
 
-## 🗄️ Estructura de Base de Datos
+## 📋 Tabla de Contenidos
 
-### Tablas Principales
-
-#### 1. Tabla `vehicle_requests`
-**Campos:**
-- `id` - Identificador único
-- `user_id` - Usuario que solicita (foreign key a users)
-- `vehicle_id` - Vehículo solicitado (foreign key a vehicles)
-- `requested_departure_date` - Fecha/hora de salida
-- `requested_return_date` - Fecha/hora de retorno
-- `description` - Descripción de la solicitud
-- `destination` - Destino del viaje
-- `event` - Evento o razón del viaje
-- `request_status_id` - Estado de la solicitud (foreign key a request_statuses)
-- `approval_date` - Fecha de aprobación/rechazo
-- `approved_by` - Usuario que aprobó/rechazó (foreign key a users)
-- `approval_note` - Nota de aprobación/rechazo
-- `creation_date` - Fecha de creación
-- `belongsTo` - Propietario/organización
-- `created_at`, `updated_at` - Timestamps
-
-**Estado:** ✅ La tabla ya existe con todos los campos necesarios
-
-#### 2. Tabla `request_statuses`
-**Campos:**
-- `id` - Identificador único
-- `name` - Nombre del estado
-
-**Estados Necesarios:**
-1. **Pendiente** - Solicitud creada, esperando aprobación
-2. **Aprobada** - Solicitud aprobada por administrador
-3. **Rechazada** - Solicitud rechazada por administrador
-4. **(Opcional) Cancelada** - Solicitud cancelada por el usuario
-5. **(Opcional) Completada** - Solicitud completada (vehículo devuelto)
-
-**Estado:** ✅ La tabla existe, verificar que tenga los estados correctos
-
-#### 3. Tabla `vehicles`
-**Campos Relevantes:**
-- `id` - Identificador único
-- `plate` - Placa del vehículo
-- `brand` - Marca
-- `model` - Modelo
-- `status_id` - Estado del vehículo (foreign key a vehicle_statuses)
-
-**Estado:** ✅ La tabla existe
-
-### Relaciones
-
-#### Relaciones en VehicleRequest:
-1. **user()** - BelongsTo User (quien solicita)
-2. **vehicle()** - BelongsTo Vehicle (vehículo solicitado)
-3. **requestStatus()** - BelongsTo RequestStatus (estado actual)
-4. **approvedBy()** - BelongsTo User (quien aprobó/rechazó)
-
-**Estado:** ✅ Todas las relaciones están definidas
+1. [Características Principales](#características-principales)
+2. [Requisitos del Sistema](#requisitos-del-sistema)
+3. [Instalación](#instalación)
+4. [Módulos del Sistema](#módulos-del-sistema)
+5. [Estado de Implementación](#estado-de-implementación)
+6. [Tecnologías Utilizadas](#tecnologías-utilizadas)
+7. [Documentación Adicional](#documentación-adicional)
 
 ---
 
-## 🎨 Elementos de Interfaz
+## ✨ Características Principales
 
-### 1. Pestaña/Navegación "Solicitudes"
-- Ubicación: Menú de navegación principal
-- Visibilidad: Usuarios autenticados
-- Icono: `heroicon-o-document-text` o `heroicon-o-calendar`
-- Contenido:
-  - Lista de Solicitudes del Usuario
-  - Botón "Nueva Solicitud"
-  - Filtros por estado
-  - Estadísticas: Widget con resumen de solicitudes
+### 🚗 Gestión de Vehículos
+- Registro completo de vehículos con información detallada (marca, modelo, placa, VIN, kilometraje, etc.)
+- Control de estados de vehículos (Activo, En Mantenimiento, No Disponible)
+- Gestión de tipos de combustible
+- Documentos asociados (seguros, revisiones técnicas, etc.)
+- Widgets de estadísticas y visualización
 
-### 2. Modal/Ventana Emergente de Creación
+### 📝 Sistema de Solicitudes
+- **Creación de solicitudes** por usuarios con selección de fechas y vehículos
+- **Validación en tiempo real** de disponibilidad de vehículos
+- **Selector reactivo** que filtra vehículos disponibles según las fechas seleccionadas
+- **Validaciones robustas**:
+  - Fechas válidas (no pasadas, retorno > salida)
+  - Rango máximo de 90 días
+  - Prevención de solapamientos con solicitudes aprobadas
+  - Verificación de estado del vehículo
+- **Estados de solicitud**: Pendiente, Aprobada, Rechazada
+- **Autorización por usuario**: Los usuarios solo ven sus propias solicitudes
+- **Edición de solicitudes pendientes** con revalidación automática
 
-**Estructura:**
-- **Header**: Título "Nueva Solicitud de Vehículo" + Botón cerrar
-- **Body**:
-  - **Sección 1: Selección de Fechas**
-    - Fecha y Hora de Salida (`requested_departure_date`)
-    - Fecha y Hora de Retorno (`requested_return_date`)
-    - Validaciones: Retorno > Salida, no fechas pasadas
-  
-  - **Sección 2: Selección de Vehículo**
-    - Select con búsqueda o lista de tarjetas
-    - Solo vehículos disponibles en el rango seleccionado
-    - Indicadores visuales de disponibilidad
-  
-  - **Sección 3: Detalles del Viaje**
-    - Destino (`destination`)
-    - Evento/Razón (`event`)
-    - Descripción (`description`) - Textarea
+### 🔧 Gestión de Mantenimientos
+- Registro de mantenimientos realizados
+- Tipos de mantenimiento (preventivo, correctivo, etc.)
+- Control de costos y talleres
+- Programación de próximos mantenimientos
+- Relación con kilometraje de vehículos
 
-- **Footer**: Botón "Cancelar" + Botón "Enviar Solicitud"
+### ⚠️ Sistema de Advertencias
+- Registro de advertencias a usuarios
+- Tipos de advertencias configurables
+- Evidencias adjuntas
+- Historial de advertencias por usuario
 
-### 3. Indicadores Visuales de Disponibilidad
+### 📄 Documentos de Vehículos
+- Almacenamiento de documentos
+- Tipos de documentos configurables
+- Control de fechas de vencimiento
+- Alertas de documentos próximos a vencer
 
-**Estados:**
-- **Disponible**: Verde, Check circle, Seleccionable
-- **Ocupado**: Rojo, X circle, "Ocupado del [fecha] al [fecha]", No seleccionable
-- **Mantenimiento**: Amarillo/Naranja, Wrench, "En Mantenimiento", No seleccionable
-- **No Disponible**: Gris, Ban, "No Disponible", No seleccionable
+### 📊 Historial de Uso
+- Registro de uso real de vehículos
+- Evidencias de uso (fotos, documentos)
+- Relación con solicitudes aprobadas
 
-### 4. Panel de Administración
-
-**Vista de Lista:**
-- Columnas: ID, Usuario, Vehículo, Fechas, Estado, Fecha de Creación, Acciones
-- Filtros: Por estado, usuario, vehículo, rango de fechas
-- Acciones Masivas: Aprobar/Rechazar múltiples solicitudes
-
-**Modal de Aprobación/Rechazo:**
-- **Aprobar**: Confirmación + Nota opcional
-- **Rechazar**: Confirmación + Motivo requerido
+### 👥 Gestión de Usuarios
+- Registro y gestión de usuarios
+- Estados de cuenta (Activo, Inactivo, Suspendido)
+- Relación con solicitudes y advertencias
 
 ---
 
-## 🔄 Flujo de Usuario
+## 💻 Requisitos del Sistema
 
-### Flujo 1: Usuario Crea una Solicitud
+### Requisitos Mínimos
+- **PHP**: 8.2 o superior
+- **Composer**: 2.0 o superior
+- **Node.js**: 18.0 o superior (para Vite)
+- **NPM**: 9.0 o superior
+- **Base de datos**: SQLite (desarrollo) o MySQL/PostgreSQL (producción)
 
-```
-1. Usuario → "Solicitudes" en el menú
-2. Se muestra lista de sus solicitudes
-3. Usuario → "Nueva Solicitud"
-4. Se abre modal de creación
-5. Usuario selecciona fecha de salida
-6. Usuario selecciona fecha de retorno
-7. Sistema filtra y muestra solo vehículos disponibles
-8. Usuario selecciona vehículo disponible
-9. Usuario completa destino, evento y descripción
-10. Usuario → "Enviar Solicitud"
-11. Sistema valida:
-    - Fechas válidas (retorno > salida)
-    - Vehículo disponible en esas fechas
-    - Usuario autenticado
-12. Si válido:
-    - Crea solicitud con estado "Pendiente"
-    - Asigna user_id del usuario actual
-    - Guarda creation_date = ahora
-    - Muestra mensaje de éxito
-    - Cierra modal
-    - Actualiza lista
-13. Si inválido:
-    - Muestra mensajes de error
-    - Modal permanece abierto
-    - Resalta campos con error
-```
+### Extensiones PHP Requeridas
+- BCMath
+- Ctype
+- cURL
+- DOM
+- Fileinfo
+- JSON
+- Mbstring
+- OpenSSL
+- PCRE
+- PDO
+- Tokenizer
+- XML
 
-### Flujo 2: Administrador Aprueba/Rechaza
+---
 
-```
-1. Administrador → "Solicitudes" (vista administrativa)
-2. Se muestra lista de TODAS las solicitudes
-3. Administrador filtra por "Pendientes" (opcional)
-4. Administrador → solicitud pendiente
-5. Se muestra vista de detalles
-6. Administrador → "Aprobar" o "Rechazar"
-7. Si "Aprobar":
-    - Modal de confirmación
-    - Nota opcional
-    - Sistema actualiza: estado, approval_date, approved_by, approval_note
-8. Si "Rechazar":
-    - Modal de confirmación
-    - Motivo requerido
-    - Sistema actualiza: estado, approval_date, approved_by, approval_note
+## 🚀 Instalación
+
+### 1. Clonar el Repositorio
+
+```bash
+git clone <url-del-repositorio>
+cd test
 ```
 
-### Flujo 3: Usuario Ve el Estado de su Solicitud
+### 2. Instalar Dependencias
 
+```bash
+# Instalar dependencias de PHP
+composer install
+
+# Instalar dependencias de Node.js
+npm install
 ```
-1. Usuario → "Solicitudes"
-2. Lista de sus solicitudes con:
-    - Vehículo solicitado
-    - Fechas
-    - Estado (badge con color)
-    - Fecha de creación
-3. Usuario → solicitud
-4. Vista de detalles con toda la información
+
+### 3. Configurar el Entorno
+
+```bash
+# Copiar archivo de entorno
+cp .env.example .env
+
+# Generar clave de aplicación
+php artisan key:generate
+```
+
+### 4. Configurar Base de Datos
+
+Editar el archivo `.env` y configurar la base de datos:
+
+```env
+DB_CONNECTION=sqlite
+# O para MySQL/PostgreSQL:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=nombre_base_datos
+# DB_USERNAME=usuario
+# DB_PASSWORD=contraseña
+```
+
+Para SQLite, crear el archivo de base de datos:
+
+```bash
+touch database/database.sqlite
+```
+
+### 5. Ejecutar Migraciones y Seeders
+
+```bash
+# Ejecutar migraciones
+php artisan migrate
+
+# Ejecutar seeders (datos iniciales)
+php artisan db:seed
+```
+
+### 6. Compilar Assets
+
+```bash
+# Desarrollo
+npm run dev
+
+# Producción
+npm run build
+```
+
+### 7. Iniciar el Servidor
+
+```bash
+# Servidor de desarrollo
+php artisan serve
+
+# O usar el comando dev que inicia todo (servidor, queue, vite)
+composer run dev
+```
+
+### 8. Acceder al Sistema
+
+Abrir en el navegador: `http://localhost:8000/admin`
+
+**Nota**: Necesitarás crear un usuario administrador. Puedes hacerlo ejecutando:
+
+```bash
+php artisan make:filament-user
 ```
 
 ---
 
-## ✅ Validaciones y Restricciones
-
-### Validaciones del Cliente (Frontend)
-
-**Fechas:**
-- Fecha de salida no puede ser en el pasado
-- Fecha de retorno debe ser posterior a la de salida
-- Rango máximo: 90 días (configurable)
-
-**Vehículo:**
-- Vehículo debe estar disponible
-- Vehículo debe estar en estado "Disponible"
-- No permitir vehículos en mantenimiento
-
-**Campos:**
-- Destino: Opcional pero recomendado
-- Evento: Opcional
-- Descripción: Opcional
-- Usuario: Automático (usuario autenticado)
-
-### Validaciones del Servidor (Backend)
-
-**Lógica de Verificación de Disponibilidad:**
-```
-Un vehículo está disponible si:
-1. No tiene solicitudes APROBADAS que se solapen con el rango de fechas
-2. El estado del vehículo es "Disponible"
-3. No está en mantenimiento en ese período
-```
-
-**Consulta de Verificación:**
-```
-Buscar solicitudes donde:
-- vehicle_id = vehículo seleccionado
-- request_status_id = "Aprobada"
-- Y se cumple alguna de estas condiciones:
-  * requested_departure_date está dentro del rango solicitado
-  * requested_return_date está dentro del rango solicitado
-  * El rango solicitado está completamente dentro de una solicitud existente
-  * Una solicitud existente está completamente dentro del rango solicitado
-```
-
-**Casos de Solapamiento:**
-1. **Solapamiento parcial inicio**: ❌ No disponible
-2. **Solapamiento parcial fin**: ❌ No disponible
-3. **Rango completamente dentro**: ❌ No disponible
-4. **Rango completamente fuera**: ✅ Disponible
-5. **Rango que contiene solicitud existente**: ❌ No disponible
-
-**Validaciones Adicionales:**
-- Usuario autenticado
-- Vehículo existe y está activo
-- Estado inicial: Siempre "Pendiente"
-- User_id automático
-- Creation_date automático
-
-### Reglas de Negocio
-
-1. Un usuario no puede tener múltiples solicitudes pendientes para el mismo vehículo en el mismo período
-2. Un usuario no puede solicitar un vehículo para fechas ya pasadas
-3. Un administrador no puede aprobar una solicitud si el vehículo ya está ocupado
-4. Una solicitud aprobada no puede ser editada (solo cancelada o completada)
-5. Una solicitud rechazada no puede ser editada (solo crear nueva)
-
----
-
-## 🔐 Manejo de Estados
-
-### Estados de Solicitud
-
-#### 1. Pendiente (Estado Inicial)
-- **Cuándo**: Al crear una nueva solicitud
-- **Características**:
-  - Puede ser editada por el usuario
-  - Puede ser cancelada por el usuario
-  - Puede ser aprobada o rechazada por administrador
-  - No bloquea la disponibilidad del vehículo
-- **Acciones**: Usuario (Editar, Cancelar, Ver) | Administrador (Aprobar, Rechazar, Ver, Editar)
-
-#### 2. Aprobada
-- **Cuándo**: Administrador aprueba la solicitud
-- **Características**:
-  - Bloquea la disponibilidad del vehículo
-  - No puede ser editada (solo cancelada)
-  - El vehículo aparece como "Ocupado"
-  - Puede ser completada cuando se devuelve
-- **Acciones**: Usuario (Ver, Cancelar) | Administrador (Ver, Cancelar, Marcar como Completada)
-
-#### 3. Rechazada
-- **Cuándo**: Administrador rechaza la solicitud
-- **Características**:
-  - No bloquea la disponibilidad del vehículo
-  - No puede ser editada
-  - Debe incluir un motivo (`approval_note`)
-  - El usuario puede crear una nueva solicitud
-- **Acciones**: Usuario (Ver) | Administrador (Ver)
-
-#### 4. Cancelada (Opcional)
-- **Cuándo**: Usuario cancela solicitud pendiente o administrador cancela aprobada
-- **Características**:
-  - Libera la disponibilidad del vehículo (si estaba aprobada)
-  - Debe incluir razón de cancelación
-  - No puede ser editada
-
-#### 5. Completada (Opcional)
-- **Cuándo**: Vehículo devuelto y registrado
-- **Características**:
-  - Libera la disponibilidad del vehículo
-  - Registra fechas reales de uso
-  - Cierra el ciclo de la solicitud
-
-### Transiciones de Estado
-
-```
-Pendiente → Aprobada (por administrador)
-Pendiente → Rechazada (por administrador)
-Pendiente → Cancelada (por usuario)
-Aprobada → Completada (por administrador/sistema)
-Aprobada → Cancelada (por usuario/administrador)
-```
-
-### Lógica de Cambio de Estado
-
-**Al Aprobar:**
-1. Verificar que el vehículo sigue disponible
-2. Si disponible: Actualizar estado, registrar approval_date, approved_by, approval_note
-3. Si no disponible: Mostrar error, mantener estado "Pendiente"
-
-**Al Rechazar:**
-1. Requerir `approval_note` (motivo)
-2. Actualizar estado a "Rechazada"
-3. Registrar approval_date, approved_by, approval_note
-4. (Opcional) Notificar al usuario
-
----
-
-## 👥 Roles y Permisos
-
-### Roles Necesarios
-
-#### 1. Usuario Regular
-**Permisos:**
-- Ver sus propias solicitudes
-- Crear nuevas solicitudes
-- Editar sus solicitudes pendientes
-- Cancelar sus solicitudes pendientes
-- Ver detalles de sus solicitudes
-- Ver estado de sus solicitudes
-
-**Restricciones:**
-- No puede ver solicitudes de otros usuarios
-- No puede aprobar/rechazar solicitudes
-- No puede editar solicitudes aprobadas/rechazadas
-
-#### 2. Administrador
-**Permisos:**
-- Ver todas las solicitudes
-- Crear solicitudes (para cualquier usuario)
-- Editar cualquier solicitud
-- Aprobar solicitudes
-- Rechazar solicitudes
-- Cancelar solicitudes
-- Ver estadísticas de solicitudes
-- Filtrar y buscar solicitudes
-
-**Sin Restricciones:**
-- Acceso completo al sistema de solicitudes
-
-### Implementación de Permisos
-
-**Nivel de Vista:**
-- Mostrar/ocultar botones según rol
-- Filtrar datos según rol (usuario solo ve las suyas)
-- Mostrar secciones adicionales para administradores
-
-**Nivel de Acción:**
-- Validar permisos antes de ejecutar acciones
-- Prevenir acciones no autorizadas
-- Mostrar mensajes de error apropiados
-
-**Nivel de Datos:**
-- Filtrar consultas según rol
-- Usuario: `where('user_id', auth()->id())`
-- Administrador: Sin filtro (ver todas)
-
----
-
-## 🔍 Consultas y Lógica de Negocio
-
-### 1. Consulta de Vehículos Disponibles
-
-**Parámetros:**
-- `fecha_inicio`: Fecha/hora de salida solicitada
-- `fecha_fin`: Fecha/hora de retorno solicitada
-- `excluir_vehicle_id`: ID de vehículo a excluir (para edición)
-
-**Lógica:**
-```
-1. Obtener todos los vehículos activos
-2. Para cada vehículo, verificar:
-   a. Estado del vehículo es "Disponible"
-   b. No tiene mantenimientos programados en ese período
-   c. No tiene solicitudes APROBADAS que se solapen
-3. Retornar solo vehículos que cumplan todas las condiciones
-```
-
-**Consulta SQL Conceptual:**
-```sql
-SELECT vehicles.*
-FROM vehicles
-WHERE vehicles.status_id = 'Disponible'
-  AND vehicles.id NOT IN (
-    SELECT vehicle_id
-    FROM vehicle_requests
-    WHERE request_status_id = 'Aprobada'
-      AND (
-        (requested_departure_date BETWEEN ? AND ?)
-        OR (requested_return_date BETWEEN ? AND ?)
-        OR (requested_departure_date <= ? AND requested_return_date >= ?)
-      )
-  )
-```
-
-### 2. Verificación de Solapamiento
-
-**Función Lógica:**
-```
-Dos rangos de fechas se solapan si:
-- Inicio1 < Fin2 AND Fin1 > Inicio2
-```
-
-**Implementación:**
-- Verificar en el servidor antes de guardar
-- Verificar en el cliente para filtrar vehículos
-- Verificar al aprobar (puede haber cambiado)
-
-### 3. Filtrado de Solicitudes por Usuario
-
-**Para Usuario Regular:**
-```sql
-WHERE user_id = usuario_autenticado
-```
-
-**Para Administrador:**
-```sql
-Sin filtro (ver todas)
-O con filtros opcionales:
-- Por usuario
-- Por vehículo
-- Por estado
-- Por rango de fechas
-```
-
----
-
-## 📊 Estructura de Archivos y Componentes
-
-### Estructura Recomendada
-
-```
-app/Filament/Resources/VehicleRequests/
-├── VehicleRequestResource.php (Recurso principal)
-├── Pages/
-│   ├── ListVehicleRequests.php (Lista - con filtros por usuario)
-│   ├── CreateVehicleRequest.php (Crear - modal o página)
-│   ├── EditVehicleRequest.php (Editar)
-│   └── ViewVehicleRequest.php (Ver detalles)
-├── Schemas/
-│   ├── VehicleRequestForm.php (Formulario)
-│   └── VehicleRequestInfolist.php (Vista de detalles)
-├── Tables/
-│   └── VehicleRequestsTable.php (Tabla de lista)
-└── Actions/
-    ├── ApproveRequestAction.php (Acción de aprobar)
-    └── RejectRequestAction.php (Acción de rechazar)
-```
-
-### Componentes de Interfaz
-
-1. **Formulario de Solicitud**
-   - DateTimePicker para fechas
-   - Select con búsqueda para vehículos
-   - TextInput para destino y evento
-   - Textarea para descripción
-   - Validaciones en tiempo real
-
-2. **Selector de Vehículos**
-   - Lista de vehículos disponibles
-   - Tarjetas con información
-   - Indicadores visuales
-   - Filtrado automático por fechas
-
-3. **Tabla de Solicitudes**
-   - Columnas relevantes
-   - Badges de estado
-   - Acciones por fila
-   - Filtros y búsqueda
-
-4. **Modal de Aprobación/Rechazo**
-   - Confirmación
-   - Campo de nota (opcional para aprobar, requerido para rechazar)
-   - Botones de acción
-
----
-
-## 🚀 Plan de Implementación
-
-### ✅ Fase 1: Configuración Básica (COMPLETADA)
-1. ✅ Verificar que la tabla `vehicle_requests` tiene todos los campos
-2. ✅ Verificar que `request_statuses` tiene los estados correctos
-3. ✅ Crear/verificar seeders para estados
-4. ✅ Habilitar el recurso VehicleRequest en la navegación
-
-### ✅ Fase 2: Formulario de Creación (COMPLETADA)
-1. ✅ Crear formulario con selección de fechas
-2. ✅ Implementar selector de vehículos
-3. ✅ Agregar validaciones de fechas (frontend)
-4. ✅ Implementar filtrado de vehículos disponibles
-5. ✅ Selector reactivo que se actualiza al cambiar fechas
-6. ✅ Validación de rango máximo de 90 días
-7. ✅ Mensajes informativos sobre disponibilidad
-
-### ✅ Fase 3: Validaciones del Servidor (COMPLETADA)
-1. ✅ Implementar verificación de disponibilidad en el servidor
-2. ✅ Agregar validaciones de solapamiento de fechas
-3. ✅ Validar estado del vehículo
-4. ✅ Validar permisos de usuario
-5. ✅ Métodos de validación en el modelo `VehicleRequest`:
-   - `validateVehicleAvailability()` - Verifica disponibilidad del vehículo
-   - `validateNoDuplicatePendingRequests()` - Evita solicitudes duplicadas
-   - `validateDatesNotInPast()` - Valida que las fechas no sean pasadas
-   - `validateReturnDateAfterDeparture()` - Valida que retorno > salida
-   - `validateDateRange()` - Valida rango máximo de 90 días
-6. ✅ Validaciones en `CreateVehicleRequest`:
-   - Todas las validaciones se ejecutan antes de crear
-   - Mensajes de error claros y específicos
-7. ✅ Validaciones en `EditVehicleRequest`:
-   - Restricción: Solicitudes aprobadas/rechazadas no pueden editar fechas/vehículo
-   - Revalidación de disponibilidad al modificar fechas
-   - Exclusión de la solicitud actual del chequeo de disponibilidad
-8. ✅ Protección contra solicitudes duplicadas
-9. ✅ Validación de rango máximo de fechas (90 días)
-
-### ✅ Fase 4: Vista de Usuario (COMPLETADA)
-1. ✅ Crear vista de lista para usuarios
-2. ✅ Filtrar solo solicitudes del usuario autenticado
-3. ✅ Mostrar estado de cada solicitud con badges coloridos
-4. ✅ Permitir ver detalles
-5. ✅ Mejoras en la tabla:
-   - Badges de estado con colores (Pending: amarillo, Approved: verde, Rejected: rojo, etc.)
-   - Información amigable: Vehículo muestra "Placa - Marca Modelo"
-   - Fechas formateadas en formato `d/m/Y H:i`
-   - Descripción de fecha de retorno en la columna de salida
-   - Tooltips para campos largos
-6. ✅ Filtros implementados:
-   - Filtro por estado (múltiple selección)
-   - Filtro por vehículo (con búsqueda)
-7. ✅ Autorización y seguridad:
-   - Usuarios solo ven sus propias solicitudes
-   - Verificación de autorización en `mount()` para editar/ver
-   - Acciones visibles solo para solicitudes del usuario
-8. ✅ Mejoras de UX:
-   - Ordenamiento por defecto: más recientes primero
-   - Estados vacíos con mensajes descriptivos
-   - Búsqueda mejorada por placa, marca y modelo
-   - Eager loading de relaciones para mejor rendimiento
-9. ✅ Manejo de errores:
-   - Verificaciones null-safe en todas las columnas
-   - Manejo seguro de relaciones null
-   - Columna de fecha de aprobación muestra '-' cuando no hay fecha
-
-### Fase 5: Panel de Administración (PENDIENTE)
-1. Crear vista de lista para administradores
-2. Implementar acciones de aprobar/rechazar
-3. Agregar filtros y búsqueda avanzada
-4. Mostrar estadísticas
-
-### Fase 6: Mejoras de UX (PENDIENTE)
-1. Agregar indicadores visuales adicionales
-2. Mejorar mensajes de feedback
-3. Optimizar consultas adicionales
-4. Agregar notificaciones (opcional)
+## 🏗️ Módulos del Sistema
+
+### 1. Vehículos (`Vehicles`)
+- CRUD completo de vehículos
+- Gestión de estados y tipos de combustible
+- Relación con documentos, mantenimientos y solicitudes
+- Widgets de estadísticas
+
+### 2. Solicitudes de Vehículos (`VehicleRequests`) ⭐ Módulo Principal
+- Formulario reactivo de creación
+- Validación de disponibilidad en tiempo real
+- Filtrado automático de vehículos disponibles
+- Tabla con filtros y búsqueda avanzada
+- Autorización por usuario
+- Widget de estadísticas de solicitudes
+
+### 3. Mantenimientos (`Maintenances`)
+- Registro de mantenimientos
+- Tipos de mantenimiento configurables
+- Control de costos y fechas
+- Widget de estadísticas
+
+### 4. Advertencias (`Warnings`)
+- Sistema de advertencias a usuarios
+- Tipos configurables
+- Evidencias adjuntas
+- Historial por usuario
+
+### 5. Documentos de Vehículos (`VehicleDocuments`)
+- Almacenamiento de documentos
+- Tipos configurables
+- Control de vencimientos
+
+### 6. Historial de Uso (`VehicleUsageHistory`)
+- Registro de uso real
+- Evidencias de uso
+- Relación con solicitudes
+
+### 7. Usuarios (`Users`)
+- Gestión de usuarios
+- Estados de cuenta
+- Relación con solicitudes y advertencias
+
+### 8. Configuración
+- Estados de vehículos (`VehicleStatuses`)
+- Estados de solicitudes (`RequestStatuses`)
+- Tipos de combustible (`FuelTypes`)
+- Tipos de mantenimiento (`MaintenanceTypes`)
+- Tipos de advertencias (`WarningTypes`)
+- Tipos de evidencias (`EvidenceTypes`)
+- Estados de cuenta (`AccountStatuses`, `UserStatuses`)
 
 ---
 
 ## 📊 Estado de Implementación
 
-### ✅ Implementado
+### ✅ Completado (Fases 1-4)
 
-#### Modelo VehicleRequest
-- ✅ Métodos de validación estáticos para reglas de negocio
-- ✅ Validación de disponibilidad de vehículos
-- ✅ Validación de solapamiento de fechas
-- ✅ Validación de solicitudes duplicadas
-- ✅ Validación de rangos de fechas
+#### Configuración Básica
+- ✅ Estructura completa de base de datos
+- ✅ Migraciones para todas las tablas
+- ✅ Modelos Eloquent con relaciones
+- ✅ Seeders para datos iniciales
+- ✅ Recursos Filament para todos los módulos
 
-#### Formulario de Solicitud
-- ✅ Selector de fechas con validaciones
+#### Sistema de Solicitudes
+- ✅ Formulario completo de creación
 - ✅ Selector reactivo de vehículos
-- ✅ Filtrado automático por disponibilidad
-- ✅ Validación de rango máximo (90 días)
-- ✅ Mensajes informativos en tiempo real
-- ✅ Validaciones del cliente (frontend)
+- ✅ Validación de disponibilidad en tiempo real
+- ✅ Validaciones del servidor:
+  - Verificación de disponibilidad
+  - Validación de solapamiento de fechas
+  - Prevención de solicitudes duplicadas
+  - Validación de fechas (no pasadas, orden correcto, rango máximo)
+- ✅ Vista de lista con filtros y búsqueda
+- ✅ Autorización por usuario
+- ✅ Edición de solicitudes pendientes
+- ✅ Widget de estadísticas
 
-#### Validaciones del Servidor
-- ✅ Verificación de disponibilidad antes de crear
-- ✅ Verificación de disponibilidad antes de editar
-- ✅ Validación de fechas no pasadas
-- ✅ Validación de orden de fechas
-- ✅ Validación de rango máximo
-- ✅ Prevención de solicitudes duplicadas
-- ✅ Restricción de edición de solicitudes aprobadas/rechazadas
-
-#### Vista de Usuario
-- ✅ Lista filtrada por usuario autenticado
-- ✅ Tabla con información amigable
-- ✅ Badges de estado con colores
-- ✅ Filtros por estado y vehículo
-- ✅ Búsqueda mejorada
-- ✅ Autorización y seguridad
-- ✅ Manejo seguro de valores null
-
-#### Modelo Vehicle
-- ✅ Método `isAvailableForDates()` para verificar disponibilidad
+#### Modelos y Validaciones
+- ✅ Métodos de validación en `VehicleRequest`
+- ✅ Método `isAvailableForDates()` en `Vehicle`
 - ✅ Scope `availableForDates()` para consultas
 - ✅ Lógica de solapamiento de fechas
-- ✅ Consideración solo de solicitudes futuras/actuales
 
-### 🔄 Pendiente
+#### Interfaz de Usuario
+- ✅ Badges de estado con colores
+- ✅ Información amigable (nombres en lugar de IDs)
+- ✅ Filtros por estado y vehículo
+- ✅ Búsqueda mejorada
+- ✅ Manejo seguro de valores null
+- ✅ Estados vacíos con mensajes descriptivos
+
+### ⏳ Pendiente (Fases 5-6)
 
 #### Panel de Administración
-- ⏳ Vista administrativa con todas las solicitudes
-- ⏳ Acciones de aprobar/rechazar
+- ⏳ Vista administrativa con todas las solicitudes (actualmente todos pueden ver todas)
+- ⏳ Acciones de aprobar/rechazar desde la interfaz
 - ⏳ Filtros avanzados para administradores
-- ⏳ Estadísticas y reportes
+- ⏳ Estadísticas y reportes administrativos
 
 #### Mejoras Adicionales
 - ⏳ Notificaciones por email
 - ⏳ Historial de cambios
+- ⏳ Cancelación de solicitudes
+- ⏳ Completar solicitudes
 - ⏳ Reportes avanzados
-- ⏳ Integración con calendario
-
----
-
-## 🔧 Consideraciones Técnicas
-
-### Performance
-
-**Optimizaciones:**
-- Índices en base de datos: En fechas y vehicle_id
-- Eager loading: Cargar relaciones necesarias
-- Cache: Cachear lista de vehículos disponibles (opcional)
-- Paginación: Paginar lista de solicitudes
-
-**Consultas Eficientes:**
-- Usar `whereHas` con condiciones específicas
-- Limitar resultados cuando sea posible
-- Usar `select` para traer solo campos necesarios
-
-### Seguridad
-
-**Validaciones:**
-- Validar permisos en cada acción
-- Validar datos de entrada
-- Prevenir SQL injection (Eloquent lo hace automáticamente)
-- Prevenir XSS (Filament lo hace automáticamente)
-
-**Autenticación:**
-- Verificar usuario autenticado
-- Verificar rol del usuario
-- Verificar ownership (usuario solo ve sus solicitudes)
-
-### Escalabilidad
-
-**Futuras Mejoras:**
-- Notificaciones por email
-- Notificaciones en tiempo real
-- Historial de cambios
-- Reportes y estadísticas
-- Integración con calendario externo
-- API para aplicaciones móviles
-
----
-
-## 📝 Consideraciones de UX/UI
-
-### Indicadores Visuales
-
-**En la Lista de Solicitudes:**
-- **Badges de estado**: 
-  - Pendiente: Amarillo/Naranja
-  - Aprobada: Verde
-  - Rechazada: Rojo
-  - Cancelada: Gris
-
-**En el Selector de Vehículos:**
-- **Tarjetas de vehículos**: 
-  - Disponible: Borde verde, icono check
-  - Ocupado: Borde rojo, icono X, texto explicativo
-  - Mantenimiento: Borde amarillo, icono wrench
-
-### Mensajes y Notificaciones
-
-**Mensajes de Éxito:**
-- "Solicitud creada exitosamente"
-- "Solicitud aprobada"
-- "Solicitud rechazada"
-- "Solicitud cancelada"
-
-**Mensajes de Error:**
-- "El vehículo no está disponible en ese período"
-- "Las fechas seleccionadas no son válidas"
-- "Debe proporcionar un motivo para rechazar"
-- "No se pudo completar la acción"
-
-**Mensajes Informativos:**
-- "Verificando disponibilidad..."
-- "Cargando vehículos disponibles..."
-- "No hay vehículos disponibles en ese período. Intente con otras fechas."
-
-### Responsive Design
-
-**Mobile:**
-- Modal a pantalla completa
-- Calendario táctil
-- Lista de vehículos scrollable
-- Botones grandes y accesibles
-
-**Desktop:**
-- Modal centrado
-- Calendario completo
-- Grid de vehículos
-- Acciones rápidas visibles
+- ⏳ Integración con calendario externo
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Laravel**: Framework PHP
-- **Filament**: Panel de administración
-- **SQLite**: Base de datos (desarrollo)
-- **PHP**: Lenguaje de programación
+### Backend
+- **Laravel 12.0**: Framework PHP moderno y robusto
+- **PHP 8.2+**: Lenguaje de programación del lado del servidor
+- **Filament 4.0**: Panel de administración moderno y elegante
+- **SQLite**: Base de datos (configurable para producción con MySQL/PostgreSQL)
+
+### Frontend
+- **Filament UI**: Interfaz de usuario construida con Livewire
+- **Tailwind CSS 4.0**: Framework de CSS utility-first
+- **Alpine.js**: Framework JavaScript ligero (incluido en Filament)
+- **Vite 7.0**: Build tool y bundler moderno
+
+### Paquetes Adicionales
+- **Guava Calendar 2.0**: Widget de calendario para visualización de eventos
+- **Laravel Tinker**: REPL para interactuar con la aplicación
+- **Faker**: Generación de datos de prueba
+
+### Herramientas de Desarrollo
+- **Laravel Pint**: Code style fixer
+- **PHPUnit**: Framework de testing
+- **Laravel Pail**: Monitoreo de logs en tiempo real
+- **Laravel Sail**: Entorno de desarrollo con Docker
+
+---
+
+## 📚 Documentación Adicional
+
+Para más detalles sobre la implementación, consultar:
+
+- **`DOCUMENTACION_PROYECTO.md`** - Documentación completa del proyecto
+- **`docs/guia-implementacion-solicitudes.md`** - Guía completa de implementación del sistema de solicitudes
+- **`docs/widgets-explicacion.md`** - Documentación de widgets
+- **`docs/widgets-explicacion-practica.md`** - Explicación práctica de widgets
+- **`docs/form-consistency-report.md`** - Reporte de consistencia de formularios
+
+---
+
+## 🔒 Seguridad
+
+### Implementado
+- ✅ Autenticación de usuarios
+- ✅ Autorización por usuario (solo ven sus solicitudes)
+- ✅ Validación de datos de entrada
+- ✅ Protección CSRF
+- ✅ Sanitización de datos
+- ✅ Prevención de SQL Injection (Eloquent)
+- ✅ Prevención de XSS (Filament)
+
+### Pendiente
+- ⏳ Roles y permisos avanzados
+- ⏳ Auditoría de acciones
+- ⏳ Logs de seguridad
+- ⏳ Rate limiting
+
+---
+
+## 🧪 Testing
+
+### Estado Actual
+- ⏳ Tests unitarios pendientes
+- ⏳ Tests de integración pendientes
+- ⏳ Tests de características pendientes
+
+### Cobertura Objetivo
+- Modelos: 80%+
+- Validaciones: 100%
+- Recursos Filament: 70%+
+- APIs: 80%+ (cuando se implementen)
+
+---
+
+## 📝 Convenciones de Código
+
+- **PSR-12** coding standard
+- **Laravel Pint** para formateo automático
+- Nombres en inglés para código
+- Comentarios en español para documentación
+
+---
+
+## 🚀 Comandos Útiles
+
+```bash
+# Desarrollo
+composer run dev              # Inicia servidor, queue y vite
+php artisan serve            # Solo servidor
+npm run dev                  # Solo Vite
+
+# Base de datos
+php artisan migrate           # Ejecutar migraciones
+php artisan migrate:fresh     # Resetear base de datos
+php artisan db:seed          # Ejecutar seeders
+
+# Filament
+php artisan make:filament-user    # Crear usuario
+php artisan filament:upgrade     # Actualizar Filament
+
+# Código
+php artisan pint             # Formatear código
+php artisan test             # Ejecutar tests
+```
 
 ---
 
@@ -768,99 +409,30 @@ Este proyecto está bajo la licencia MIT.
 
 ---
 
-## 📚 Documentación Adicional
+## 👥 Contribuidores
 
-Para más detalles sobre la implementación, consultar:
-- `docs/guia-implementacion-solicitudes.md` - Guía completa de implementación
-- `docs/widgets-explicacion.md` - Documentación de widgets
-- `docs/form-consistency-report.md` - Reporte de consistencia de formularios
+Este proyecto ha sido desarrollado como sistema de gestión de flotilla de vehículos.
 
----
-
-## 📝 Notas de Implementación
-
-### Archivos Principales Implementados
-
-#### Modelos
-- `app/Models/VehicleRequest.php`
-  - Métodos de validación estáticos
-  - Validación de disponibilidad
-  - Validación de reglas de negocio
-
-- `app/Models/Vehicle.php`
-  - Método `isAvailableForDates()`
-  - Scope `availableForDates()`
-  - Lógica de solapamiento
-
-#### Recursos Filament
-- `app/Filament/Resources/VehicleRequests/VehicleRequestResource.php`
-  - Recurso principal configurado
-
-- `app/Filament/Resources/VehicleRequests/Pages/CreateVehicleRequest.php`
-  - Validaciones del servidor antes de crear
-  - Asignación automática de usuario y fechas
-
-- `app/Filament/Resources/VehicleRequests/Pages/EditVehicleRequest.php`
-  - Validaciones del servidor antes de editar
-  - Restricción de edición de solicitudes aprobadas/rechazadas
-  - Autorización de acceso
-
-- `app/Filament/Resources/VehicleRequests/Pages/ListVehicleRequests.php`
-  - Filtrado por usuario autenticado
-  - Eager loading de relaciones
-
-- `app/Filament/Resources/VehicleRequests/Pages/ViewVehicleRequest.php`
-  - Autorización de acceso
-  - Vista de detalles
-
-- `app/Filament/Resources/VehicleRequests/Schemas/VehicleRequestForm.php`
-  - Formulario reactivo con validaciones
-  - Selector de vehículos dinámico
-  - Validaciones del cliente
-
-- `app/Filament/Resources/VehicleRequests/Tables/VehicleRequestsTable.php`
-  - Tabla con badges de estado
-  - Información amigable
-  - Filtros y búsqueda
-  - Manejo seguro de valores null
-
-#### Seeders
-- `database/seeders/VehicleSeeder.php`
-  - Creación de vehículos de prueba
-  - Actualización de estado a "Active"
-
-### Características Implementadas
-
-#### Validaciones
-1. **Frontend (Cliente)**:
-   - Fecha de salida no puede ser en el pasado
-   - Fecha de retorno debe ser posterior a la de salida
-   - Rango máximo de 90 días
-   - Selector de vehículos solo muestra disponibles
-
-2. **Backend (Servidor)**:
-   - Verificación de disponibilidad del vehículo
-   - Validación de solapamiento de fechas
-   - Prevención de solicitudes duplicadas
-   - Validación de estado del vehículo
-   - Validación de permisos de usuario
-   - Restricción de edición de solicitudes aprobadas/rechazadas
-
-#### Seguridad
-- Usuarios solo ven sus propias solicitudes
-- Verificación de autorización al editar/ver
-- Validación de usuario autenticado
-- Prevención de acceso no autorizado
-
-#### UX/UI
-- Badges de estado con colores
-- Información amigable (nombres en lugar de IDs)
-- Mensajes informativos en tiempo real
-- Filtros y búsqueda mejorada
-- Manejo seguro de errores
-- Estados vacíos con mensajes descriptivos
+### Tecnologías y Recursos
+- [Laravel Framework](https://laravel.com)
+- [Filament Admin Panel](https://filamentphp.com)
+- [Guava Calendar](https://github.com/guava/calendar)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Heroicons](https://heroicons.com)
 
 ---
 
-**Última actualización**: Diciembre 2024
+## 📞 Soporte
+
+Para más información o soporte, consultar la documentación adicional en la carpeta `docs/`.
+
+### Recursos Externos
+- [Documentación de Laravel](https://laravel.com/docs)
+- [Documentación de Filament](https://filamentphp.com/docs)
+- [Documentación de Guava Calendar](https://github.com/guava/calendar)
+
+---
+
+**Última actualización**: Diciembre 2024  
+**Versión**: 1.0  
 **Estado**: Fases 1-4 Completadas ✅ | Fases 5-6 Pendientes ⏳

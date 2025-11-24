@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             MaintenanceTypeSeeder::class,
             RequestStatusSeeder::class,
             VehicleSeeder::class,
+            RolesAndPermissionsSeeder::class, // Roles y permisos
         ]);
     }
 }

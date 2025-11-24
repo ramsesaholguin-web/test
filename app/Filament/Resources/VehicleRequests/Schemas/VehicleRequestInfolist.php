@@ -126,20 +126,24 @@ class VehicleRequestInfolist
                             ->visible(fn ($record) => $record && $record->approvedBy !== null),
                         
                         TextEntry::make('approval_note')
-                            ->label(fn ($record) => $record && $record->requestStatus?->name === 'Rejected' 
-                                ? 'Rejection Reason' 
-                                : 'Approval Note'
-                            )
-                            ->icon(fn ($record) => $record && $record->requestStatus?->name === 'Rejected'
-                                ? 'heroicon-o-exclamation-circle'
-                                : 'heroicon-o-document-text'
-                            )
+                            ->label(fn ($record) => match($record?->requestStatus?->name) {
+                                'Rejected' => 'Rejection Reason',
+                                'Cancelled' => 'Cancellation Reason',
+                                'Approved' => 'Approval Note',
+                                default => 'Note'
+                            })
+                            ->icon(fn ($record) => match($record?->requestStatus?->name) {
+                                'Rejected' => 'heroicon-o-exclamation-circle',
+                                'Cancelled' => 'heroicon-o-x-mark',
+                                'Approved' => 'heroicon-o-document-text',
+                                default => 'heroicon-o-document-text'
+                            })
                             ->placeholder('No note provided')
                             ->visible(fn ($record) => $record && $record->approval_note !== null)
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
-                    ->visible(fn ($record) => $record && $record->approval_date !== null)
+                    ->visible(fn ($record) => $record && ($record->approval_date !== null || $record->requestStatus?->name === 'Cancelled'))
                     ->collapsible(),
                 
                 // Sección 5: Información Adicional

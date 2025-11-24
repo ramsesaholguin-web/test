@@ -248,6 +248,93 @@ class VehicleRequestsTable
                         return $pendingStatus && $record->request_status_id === $pendingStatus->id;
                     }),
                 
+                // Acción para Cancelar Solicitud
+                Action::make('cancel')
+                    ->label('Cancel')
+                    ->icon('heroicon-o-x-mark')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Cancel Vehicle Request')
+                    ->modalDescription(fn ($record) => "Are you sure you want to cancel the request from " . ($record->user->name ?? 'user') . " for vehicle " . ($record->vehicle->plate ?? 'N/A') . "?")
+                    ->form([
+                        Textarea::make('cancellation_reason')
+                            ->label('Cancellation Reason')
+                            ->placeholder('Please provide a reason for cancelling this request...')
+                            ->required()
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->helperText('A reason is required when cancelling a request.'),
+                    ])
+                    ->action(function (VehicleRequest $record, array $data) {
+                        // Obtener estados
+                        $cancelledStatus = RequestStatus::where('name', 'Cancelled')->first();
+                        $pendingStatus = RequestStatus::where('name', 'Pending')->first();
+                        $approvedStatus = RequestStatus::where('name', 'Approved')->first();
+                        
+                        // Validar que la solicitud esté pendiente o aprobada
+                        if (!$pendingStatus || !$approvedStatus) {
+                            Notification::make()
+                                ->title('Error')
+                                ->body('Unable to cancel request. Required statuses not found.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                        
+                        $canCancel = false;
+                        if (auth()->user()?->hasRole('admin')) {
+                            // Admin puede cancelar pendientes o aprobadas
+                            $canCancel = ($record->request_status_id === $pendingStatus->id) ||
+                                        ($record->request_status_id === $approvedStatus->id);
+                        } else {
+                            // Usuario solo puede cancelar sus propias solicitudes pendientes
+                            $canCancel = ($record->request_status_id === $pendingStatus->id) &&
+                                        ($record->user_id === auth()->id());
+                        }
+                        
+                        if (!$canCancel) {
+                            Notification::make()
+                                ->title('Error')
+                                ->body('This request cannot be cancelled. Only pending requests can be cancelled by users, or admins can cancel pending/approved requests.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                        
+                        // Actualizar solicitud
+                        $record->update([
+                            'request_status_id' => $cancelledStatus->id,
+                            'approval_date' => now(),
+                            'approved_by' => auth()->id(),
+                            'approval_note' => $data['cancellation_reason'],
+                        ]);
+                        
+                        Notification::make()
+                            ->title('Request Cancelled')
+                            ->body('The vehicle request has been cancelled successfully.')
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(function ($record) {
+                        if (!$record) return false;
+                        $pendingStatus = RequestStatus::where('name', 'Pending')->first();
+                        $approvedStatus = RequestStatus::where('name', 'Approved')->first();
+                        $cancelledStatus = RequestStatus::where('name', 'Cancelled')->first();
+                        
+                        if (!$pendingStatus || !$approvedStatus) return false;
+                        
+                        // Usuarios solo pueden cancelar sus propias solicitudes pendientes
+                        // Admins pueden cancelar pendientes o aprobadas
+                        if (auth()->user()?->hasRole('admin')) {
+                            return ($record->request_status_id === $pendingStatus->id) ||
+                                   ($record->request_status_id === $approvedStatus->id);
+                        } else {
+                            return $pendingStatus && 
+                                   $record->request_status_id === $pendingStatus->id &&
+                                   $record->user_id === auth()->id();
+                        }
+                    }),
+                
                 EditAction::make()
                     ->visible(fn ($record) => $record && $record->user_id === auth()->id()), // Solo puede editar sus propias solicitudes
             ])
