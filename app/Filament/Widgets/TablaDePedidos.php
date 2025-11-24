@@ -6,7 +6,14 @@ use Filament\Widgets\ChartWidget;
 
 class TablaDePedidos extends ChartWidget
 {
+    protected static ?int $sort = 5;
+
     protected ?string $heading = 'Tabla De Pedidos';
+
+    public static function canView(): bool
+    {
+        return false;
+    }
 
     protected function getData(): array
     {

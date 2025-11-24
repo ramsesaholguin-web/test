@@ -8,6 +8,15 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class Pedidos extends StatsOverviewWidget
 {
+    protected static ?int $sort = 4;
+
+    protected int | string | array $columnSpan = 3;
+
+    public static function canView(): bool
+    {
+        return false;
+    }
+
     protected ?string $heading = 'Solicitudes de Vehículos';
 
     protected function getStats(): array
