@@ -8,6 +8,10 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class EstadisticasSolicitudes extends StatsOverviewWidget
 {
+    protected static ?int $sort = 3;
+
+    protected int | string | array $columnSpan = 3;
+
     protected ?string $heading = 'Estadísticas de Solicitudes';
 
     protected function getStats(): array

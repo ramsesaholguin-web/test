@@ -16,6 +16,8 @@ use Illuminate\Support\HtmlString;
 
 class Calendario extends CalendarWidget
 {
+    protected static ?int $sort = 7;
+
     protected string | HtmlString | null | bool $heading = 'Calendario de Solicitudes';
     
     // Habilitar clics en eventos
