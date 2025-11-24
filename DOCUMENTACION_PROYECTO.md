@@ -31,10 +31,11 @@ Sistema completo desarrollado en Laravel con Filament para la gestión integral 
 
 ### Estado del Proyecto
 - ✅ **Fases 1-4**: Completadas
-- ⏳ **Fases 5-6**: En desarrollo/Pendientes
+- ✅ **Fase 5**: Parcialmente Completada (Roles, Permisos, Cancelación)
+- ⏳ **Fase 6**: En desarrollo/Pendiente
 
 ### Fecha de Última Actualización
-Diciembre 2024
+Diciembre 2024 (v1.1)
 
 ---
 
@@ -90,6 +91,8 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 
 ### Paquetes Adicionales
 - **Guava Calendar 2.0**: Widget de calendario para visualización de eventos
+- **Filament Shield 4.0**: Sistema de roles y permisos para Filament
+- **Spatie Permission 6.0**: Sistema de gestión de roles y permisos (usado por Shield)
 - **Laravel Tinker**: REPL para interactuar con la aplicación
 - **Faker**: Generación de datos de prueba
 
@@ -247,9 +250,17 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 
 #### Edición de Solicitudes
 - ✅ Edición de solicitudes pendientes
-- ✅ Restricción: Solicitudes aprobadas/rechazadas no editables
+- ✅ Restricción: Solicitudes aprobadas/rechazadas/canceladas no editables
 - ✅ Revalidación de disponibilidad al modificar fechas
 - ✅ Exclusión de la solicitud actual del chequeo de disponibilidad
+
+#### Cancelación de Solicitudes
+- ✅ Acción de cancelar implementada en vista y tabla
+- ✅ Usuarios regulares: Solo pueden cancelar sus solicitudes pendientes
+- ✅ Administradores: Pueden cancelar solicitudes pendientes o aprobadas
+- ✅ Campo de motivo de cancelación (requerido)
+- ✅ Actualización automática de estado a "Cancelled"
+- ✅ Registro de quién y cuándo canceló
 
 ### Recursos Filament Implementados ✅
 
@@ -274,6 +285,40 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 - ✅ Gestión de documentos
 - ✅ Gestión de tipos y estados
 
+### Sistema de Roles y Permisos ✅
+
+#### Implementación
+- ✅ **Filament Shield 4.0** instalado y configurado
+- ✅ **Spatie Permission 6.0** integrado
+- ✅ Modelo User actualizado con trait `HasRoles`
+- ✅ Migraciones de permisos ejecutadas
+- ✅ Seeder `RolesAndPermissionsSeeder` creado
+
+#### Roles Configurados
+- ✅ **admin**: Acceso completo al sistema
+  - Puede ver todos los recursos (Users, Vehicles, Solicitudes, etc.)
+  - Puede aprobar/rechazar/cancelar cualquier solicitud
+  - Puede gestionar usuarios y vehículos
+  
+- ✅ **usuario**: Acceso limitado
+  - Solo puede ver sus propias solicitudes
+  - Puede crear nuevas solicitudes
+  - Puede editar sus solicitudes pendientes
+  - Puede cancelar sus solicitudes pendientes
+  - **NO** puede ver recursos Users ni Vehicles
+
+#### Permisos Aplicados
+- ✅ `UserResource`: Solo visible para usuarios con rol `admin`
+- ✅ `VehicleResource`: Solo visible para usuarios con rol `admin`
+- ✅ `VehicleRequestResource`: Visible para todos, con filtrado automático por rol
+- ✅ Acciones de aprobar/rechazar: Solo visibles para administradores
+- ✅ Acción de cancelar: Visible según rol (usuarios: sus pendientes, admins: todas)
+
+#### Filtrado Automático
+- ✅ `ListVehicleRequests`: Filtra automáticamente según rol
+  - Administradores: Ven todas las solicitudes
+  - Usuarios regulares: Solo ven sus propias solicitudes
+
 ### Widgets Implementados ✅
 
 - ✅ `Calendario.php` - Calendario de solicitudes
@@ -290,33 +335,36 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 
 ### Fase 5: Panel de Administración ⏳
 
-#### Vista Administrativa de Solicitudes
-- ⏳ Vista de lista con TODAS las solicitudes (no solo del usuario)
+#### Vista Administrativa de Solicitudes ✅
+- ✅ Vista de lista con filtrado automático por rol:
+  - Administradores ven TODAS las solicitudes
+  - Usuarios regulares solo ven SUS solicitudes
+- ✅ Acciones de aprobar/rechazar desde la interfaz
 - ⏳ Filtros avanzados para administradores:
-  - Por usuario
-  - Por vehículo
+  - Por usuario (básico implementado)
+  - Por vehículo (básico implementado)
   - Por rango de fechas
-  - Por estado
+  - Por estado (básico implementado)
   - Por fecha de creación
-- ⏳ Búsqueda avanzada
-- ⏳ Estadísticas y reportes para administradores
+- ✅ Búsqueda básica implementada
+- ⏳ Estadísticas y reportes avanzados para administradores
 
-#### Acciones de Aprobación/Rechazo
-- ⏳ Acción de aprobar solicitudes
+#### Acciones de Aprobación/Rechazo ✅
+- ✅ Acción de aprobar solicitudes
   - Modal de confirmación
   - Campo opcional de nota
   - Actualización de estado, fecha y usuario aprobador
   - Verificación de disponibilidad al aprobar
-- ⏳ Acción de rechazar solicitudes
+- ✅ Acción de rechazar solicitudes
   - Modal de confirmación
   - Campo requerido de motivo
   - Actualización de estado, fecha y usuario aprobador
 - ⏳ Acciones masivas (aprobar/rechazar múltiples)
 
-#### Validaciones de Aprobación
-- ⏳ Verificar disponibilidad al momento de aprobar (puede haber cambiado)
-- ⏳ Prevenir aprobación si el vehículo ya está ocupado
-- ⏳ Mensajes de error apropiados
+#### Validaciones de Aprobación ✅
+- ✅ Verificar disponibilidad al momento de aprobar (puede haber cambiado)
+- ✅ Prevenir aprobación si el vehículo ya está ocupado
+- ✅ Mensajes de error apropiados
 
 ### Fase 6: Mejoras de UX ⏳
 
@@ -342,11 +390,13 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 - ⏳ Auditoría de acciones de administradores
 - ⏳ Log de modificaciones
 
-#### Cancelación de Solicitudes
-- ⏳ Permitir a usuarios cancelar solicitudes pendientes
-- ⏳ Permitir a administradores cancelar solicitudes aprobadas
-- ⏳ Campo de razón de cancelación
-- ⏳ Estado "Cancelada"
+#### Cancelación de Solicitudes ✅
+- ✅ Permitir a usuarios cancelar solicitudes pendientes
+- ✅ Permitir a administradores cancelar solicitudes aprobadas
+- ✅ Campo de razón de cancelación (requerido)
+- ✅ Estado "Cancelled" implementado
+- ✅ Validaciones por rol (usuarios solo sus pendientes)
+- ✅ Acción disponible en vista de detalles y tabla
 
 #### Completar Solicitudes
 - ⏳ Marcar solicitudes como completadas
@@ -679,7 +729,14 @@ CREATE INDEX idx_maintenances_vehicle ON maintenances(vehicle_id, maintenance_da
 
 ### Implementado
 - ✅ Autenticación de usuarios
+- ✅ **Sistema de roles y permisos** (Filament Shield + Spatie Permission)
+- ✅ **Roles implementados**:
+  - `admin`: Acceso completo al sistema
+  - `usuario`: Acceso limitado (solo sus solicitudes)
+- ✅ Permisos granulares por recurso
+- ✅ Recursos protegidos (Users y Vehicles solo para admins)
 - ✅ Autorización por usuario (solo ven sus solicitudes)
+- ✅ Filtrado automático por rol en ListVehicleRequests
 - ✅ Validación de datos de entrada
 - ✅ Protección CSRF
 - ✅ Sanitización de datos
@@ -687,7 +744,6 @@ CREATE INDEX idx_maintenances_vehicle ON maintenances(vehicle_id, maintenance_da
 - ✅ Prevención de XSS (Filament)
 
 ### Pendiente
-- ⏳ Roles y permisos avanzados
 - ⏳ Auditoría de acciones
 - ⏳ Logs de seguridad
 - ⏳ Rate limiting
@@ -749,6 +805,7 @@ CREATE INDEX idx_maintenances_vehicle ON maintenances(vehicle_id, maintenance_da
 
 ### Documentación Adicional
 - `README.md` - Documentación principal
+- `ASIGNAR_ROLES.md` - Guía para asignar roles a usuarios
 - `docs/guia-implementacion-solicitudes.md` - Guía de implementación
 - `docs/widgets-explicacion.md` - Documentación de widgets
 - `docs/form-consistency-report.md` - Reporte de consistencia
@@ -799,6 +856,13 @@ El proyecto demuestra buenas prácticas de desarrollo, arquitectura limpia y una
 ---
 
 **Última actualización**: Diciembre 2024  
-**Versión del documento**: 1.0  
+**Versión del documento**: 1.1  
 **Autor**: Equipo de Desarrollo
+
+### 🆕 Cambios en v1.1
+- ✅ Sistema de roles y permisos implementado (Filament Shield + Spatie Permission)
+- ✅ Cancelación de solicitudes implementada
+- ✅ Filtrado automático por rol en ListVehicleRequests
+- ✅ Recursos Users y Vehicles protegidos (solo admins)
+- ✅ Usuarios de prueba creados (admin y usuario regular)
 

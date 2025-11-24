@@ -261,8 +261,11 @@ php artisan make:filament-user
   - Prevención de solicitudes duplicadas
   - Validación de fechas (no pasadas, orden correcto, rango máximo)
 - ✅ Vista de lista con filtros y búsqueda
-- ✅ Autorización por usuario
+- ✅ Autorización por usuario (usuarios solo ven sus solicitudes)
+- ✅ Filtrado automático por rol (admins ven todas, usuarios solo las suyas)
 - ✅ Edición de solicitudes pendientes
+- ✅ Acciones de aprobar/rechazar solicitudes
+- ✅ Cancelación de solicitudes (usuarios: pendientes, admins: pendientes/aprobadas)
 - ✅ Widget de estadísticas
 
 #### Modelos y Validaciones
@@ -279,18 +282,31 @@ php artisan make:filament-user
 - ✅ Manejo seguro de valores null
 - ✅ Estados vacíos con mensajes descriptivos
 
+#### Sistema de Roles y Permisos
+- ✅ Implementado con Filament Shield y Spatie Permission
+- ✅ Roles configurados: `admin` y `usuario`
+- ✅ Permisos granulares por recurso
+- ✅ Recursos Users y Vehicles ocultos para usuarios regulares
+- ✅ Usuarios regulares solo ven sus propias solicitudes
+- ✅ Administradores tienen acceso completo
+
+#### Gestión de Estados de Solicitudes
+- ✅ Estados: Pendiente, Aprobada, Rechazada, **Cancelled**
+- ✅ Cancelación de solicitudes implementada
+- ✅ Validaciones por rol (usuarios solo pueden cancelar sus pendientes)
+- ✅ Registro de quién y cuándo canceló
+
 ### ⏳ Pendiente (Fases 5-6)
 
 #### Panel de Administración
-- ⏳ Vista administrativa con todas las solicitudes (actualmente todos pueden ver todas)
-- ⏳ Acciones de aprobar/rechazar desde la interfaz
+- ✅ Vista administrativa con todas las solicitudes (implementado con filtrado por rol)
+- ✅ Acciones de aprobar/rechazar desde la interfaz (implementado)
 - ⏳ Filtros avanzados para administradores
 - ⏳ Estadísticas y reportes administrativos
 
 #### Mejoras Adicionales
 - ⏳ Notificaciones por email
 - ⏳ Historial de cambios
-- ⏳ Cancelación de solicitudes
 - ⏳ Completar solicitudes
 - ⏳ Reportes avanzados
 - ⏳ Integración con calendario externo
@@ -313,6 +329,8 @@ php artisan make:filament-user
 
 ### Paquetes Adicionales
 - **Guava Calendar 2.0**: Widget de calendario para visualización de eventos
+- **Filament Shield 4.0**: Sistema de roles y permisos para Filament
+- **Spatie Permission 6.0**: Sistema de gestión de roles y permisos
 - **Laravel Tinker**: REPL para interactuar con la aplicación
 - **Faker**: Generación de datos de prueba
 
@@ -329,6 +347,7 @@ php artisan make:filament-user
 Para más detalles sobre la implementación, consultar:
 
 - **`DOCUMENTACION_PROYECTO.md`** - Documentación completa del proyecto
+- **`ASIGNAR_ROLES.md`** - Guía para asignar roles a usuarios
 - **`docs/guia-implementacion-solicitudes.md`** - Guía completa de implementación del sistema de solicitudes
 - **`docs/widgets-explicacion.md`** - Documentación de widgets
 - **`docs/widgets-explicacion-practica.md`** - Explicación práctica de widgets
@@ -340,7 +359,10 @@ Para más detalles sobre la implementación, consultar:
 
 ### Implementado
 - ✅ Autenticación de usuarios
+- ✅ **Sistema de roles y permisos** (Filament Shield + Spatie Permission)
+- ✅ **Roles**: Admin y Usuario con permisos granulares
 - ✅ Autorización por usuario (solo ven sus solicitudes)
+- ✅ Recursos protegidos (Users y Vehicles solo para admins)
 - ✅ Validación de datos de entrada
 - ✅ Protección CSRF
 - ✅ Sanitización de datos
@@ -348,10 +370,10 @@ Para más detalles sobre la implementación, consultar:
 - ✅ Prevención de XSS (Filament)
 
 ### Pendiente
-- ⏳ Roles y permisos avanzados
 - ⏳ Auditoría de acciones
 - ⏳ Logs de seguridad
 - ⏳ Rate limiting
+- ⏳ Autenticación de dos factores (2FA)
 
 ---
 
@@ -433,6 +455,12 @@ Para más información o soporte, consultar la documentación adicional en la ca
 
 ---
 
-**Última actualización**: Diciembre 2024  
-**Versión**: 1.0  
-**Estado**: Fases 1-4 Completadas ✅ | Fases 5-6 Pendientes ⏳
+**Última actualización**: Diciembre 2024
+**Versión**: 1.1  
+**Estado**: Fases 1-4 Completadas ✅ | Fase 5 Parcialmente Completada ✅ | Fase 6 Pendiente ⏳
+
+### 🆕 Nuevas Funcionalidades (v1.1)
+- ✅ Sistema de roles y permisos con Filament Shield
+- ✅ Cancelación de solicitudes
+- ✅ Filtrado automático por usuario según rol
+- ✅ Protección de recursos (Users y Vehicles)
