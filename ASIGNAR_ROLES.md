@@ -5,6 +5,19 @@
 1. **admin**: Acceso completo al sistema, puede ver y gestionar todo
 2. **usuario**: Acceso limitado, solo puede ver y crear sus propias solicitudes
 
+## Usuarios de Prueba Creados
+
+### Usuario Administrador
+- **Email**: `ramsesaholguin@gmail.com`
+- **Rol**: `admin`
+- **Acceso**: Completo (puede ver Usuarios, Vehículos y todas las solicitudes)
+
+### Usuario Regular
+- **Email**: `usuario@example.com`
+- **Password**: `password`
+- **Rol**: `usuario`
+- **Acceso**: Limitado (solo puede ver sus propias solicitudes, NO puede ver Usuarios ni Vehículos)
+
 ## Asignar Roles a Usuarios
 
 ### Opción 1: Desde Tinker (Recomendado para desarrollo)
