@@ -30,6 +30,27 @@ class UsersTable
                     ->copyable()
                     ->icon('heroicon-o-envelope'),
                 
+                TextColumn::make('roles.name')
+                    ->label('Role')
+                    ->badge()
+                    ->color(fn (string $state): string => match (strtolower($state ?? '')) {
+                        'super_admin' => 'danger',
+                        'usuario' => 'gray',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'super_admin' => 'Super Admin',
+                        'usuario' => 'Usuario',
+                        default => ucfirst($state ?? 'No role'),
+                    })
+                    ->icon(fn ($state) => match ($state) {
+                        'super_admin' => 'heroicon-o-shield-check',
+                        'usuario' => 'heroicon-o-user',
+                        default => null,
+                    })
+                    ->sortable()
+                    ->placeholder('No role assigned'),
+                
                 TextColumn::make('accountStatus.name')
                     ->label('Account Status')
                     ->badge()
@@ -131,6 +152,13 @@ class UsersTable
                         false: fn ($query) => $query->doesntHave('warnings'),
                         blank: fn ($query) => $query,
                     ),
+                
+                // Filtro por Rol
+                SelectFilter::make('role')
+                    ->label('Role')
+                    ->relationship('roles', 'name')
+                    ->preload()
+                    ->searchable(),
             ])
             ->recordActions([
                 ViewAction::make(),

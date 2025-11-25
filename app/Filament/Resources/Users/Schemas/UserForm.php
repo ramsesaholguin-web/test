@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\Shared\Schemas\FormTemplate;
+use Spatie\Permission\Models\Role;
 
 class UserForm
 {
@@ -40,13 +41,41 @@ class UserForm
                         ->placeholder('Select user status...')
                         ->helperText('The current status of the user'),
                     
+                    Select::make('role')
+                        ->label('Role')
+                        ->options(function () {
+                            return Role::where('guard_name', 'web')
+                                ->whereIn('name', ['super_admin', 'usuario'])
+                                ->pluck('name', 'name')
+                                ->mapWithKeys(function ($name) {
+                                    $labels = [
+                                        'super_admin' => 'Super Admin',
+                                        'usuario' => 'Usuario',
+                                    ];
+                                    return [$name => $labels[$name] ?? ucfirst($name)];
+                                });
+                        })
+                        ->default('usuario')
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->placeholder('Select user role...')
+                        ->helperText('The role determines the user\'s permissions in the system')
+                        ->dehydrated(true)
+                        ->afterStateHydrated(function (Select $component, $state, $record) {
+                            if ($record && $record->exists) {
+                                $role = $record->roles->first();
+                                $component->state($role ? $role->name : 'usuario');
+                            }
+                        }),
+                    
                     DateTimePicker::make('email_verified_at')
                         ->label('Email Verified At')
                         ->displayFormat('d/m/Y H:i')
                         ->native(false)
                         ->seconds(false)
                         ->helperText('Date when the email was verified'),
-                ])->columns(3),
+                ])->columns(2),
                 
                 FormTemplate::basicSection('Password', [
                     TextInput::make('password')

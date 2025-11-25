@@ -36,8 +36,8 @@ class ListVehicleRequests extends ListRecords
         $query = parent::getTableQuery()
             ->with(['vehicle', 'requestStatus', 'user', 'approvedBy']); // Cargar relaciones para mejor rendimiento
         
-        // Si el usuario no es admin, filtrar solo sus solicitudes
-        if (!auth()->user()?->hasRole('admin')) {
+        // Si el usuario no es super_admin, filtrar solo sus solicitudes
+        if (!auth()->user()?->hasRole('super_admin')) {
             $query->where('user_id', auth()->id());
         }
         

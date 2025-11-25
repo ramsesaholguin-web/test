@@ -104,8 +104,8 @@ class ViewVehicleRequest extends ViewRecord
                     $cancelledStatus = RequestStatus::where('name', 'Cancelled')->first();
                     
                     // Usuarios solo pueden cancelar sus propias solicitudes pendientes
-                    // Admins pueden cancelar pendientes o aprobadas
-                    if (auth()->user()?->hasRole('admin')) {
+                    // Super Admins pueden cancelar pendientes o aprobadas
+                    if (auth()->user()?->hasRole('super_admin')) {
                         return ($pendingStatus && $this->record->request_status_id === $pendingStatus->id) ||
                                ($approvedStatus && $this->record->request_status_id === $approvedStatus->id);
                     } else {
@@ -230,8 +230,8 @@ class ViewVehicleRequest extends ViewRecord
         }
         
         $canCancel = false;
-        if (auth()->user()?->hasRole('admin')) {
-            // Admin puede cancelar pendientes o aprobadas
+        if (auth()->user()?->hasRole('super_admin')) {
+            // Super Admin puede cancelar pendientes o aprobadas
             $canCancel = ($this->record->request_status_id === $pendingStatus->id) ||
                         ($this->record->request_status_id === $approvedStatus->id);
         } else {

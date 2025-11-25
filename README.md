@@ -150,9 +150,18 @@ touch database/database.sqlite
 # Ejecutar migraciones
 php artisan migrate
 
-# Ejecutar seeders (datos iniciales)
+# Ejecutar seeders (datos iniciales y roles)
 php artisan db:seed
 ```
+
+**Nota importante sobre roles:**
+- El seeder crea automáticamente los roles: `super_admin` y `usuario`
+- El primer usuario que se registre desde `/admin/register` recibirá automáticamente el rol `super_admin`
+- Para generar los permisos de Shield (recomendado), ejecuta:
+  ```bash
+  php artisan shield:generate
+  ```
+- Luego puedes asignar permisos a los roles desde `/admin/shield/roles`
 
 ### 6. Compilar Assets
 
@@ -178,11 +187,15 @@ composer run dev
 
 Abrir en el navegador: `http://localhost:8000/admin`
 
-**Nota**: Necesitarás crear un usuario administrador. Puedes hacerlo ejecutando:
+**Nota**: El primer usuario que se registre desde `/admin/register` recibirá automáticamente el rol `super_admin` con acceso completo al sistema.
+
+Para generar los permisos de Shield (recomendado):
 
 ```bash
-php artisan make:filament-user
+php artisan shield:generate
 ```
+
+Luego puedes asignar permisos a los roles desde `/admin/shield/roles`.
 
 ---
 
@@ -262,10 +275,10 @@ php artisan make:filament-user
   - Validación de fechas (no pasadas, orden correcto, rango máximo)
 - ✅ Vista de lista con filtros y búsqueda
 - ✅ Autorización por usuario (usuarios solo ven sus solicitudes)
-- ✅ Filtrado automático por rol (admins ven todas, usuarios solo las suyas)
+- ✅ Filtrado automático por rol (super_admins ven todas, usuarios solo las suyas)
 - ✅ Edición de solicitudes pendientes
 - ✅ Acciones de aprobar/rechazar solicitudes
-- ✅ Cancelación de solicitudes (usuarios: pendientes, admins: pendientes/aprobadas)
+- ✅ Cancelación de solicitudes (usuarios: pendientes, super_admins: pendientes/aprobadas)
 - ✅ Widget de estadísticas
 
 #### Modelos y Validaciones
@@ -284,11 +297,13 @@ php artisan make:filament-user
 
 #### Sistema de Roles y Permisos
 - ✅ Implementado con Filament Shield y Spatie Permission
-- ✅ Roles configurados: `admin` y `usuario`
+- ✅ Roles configurados: `super_admin` y `usuario`
 - ✅ Permisos granulares por recurso
 - ✅ Recursos Users y Vehicles ocultos para usuarios regulares
 - ✅ Usuarios regulares solo ven sus propias solicitudes
-- ✅ Administradores tienen acceso completo
+- ✅ Super administradores tienen acceso completo e ilimitado
+- ✅ El primer usuario que se registre recibe automáticamente el rol `super_admin`
+- ✅ Asignación de roles desde la interfaz de Filament al crear/editar usuarios
 
 #### Gestión de Estados de Solicitudes
 - ✅ Estados: Pendiente, Aprobada, Rechazada, **Cancelled**
@@ -360,9 +375,10 @@ Para más detalles sobre la implementación, consultar:
 ### Implementado
 - ✅ Autenticación de usuarios
 - ✅ **Sistema de roles y permisos** (Filament Shield + Spatie Permission)
-- ✅ **Roles**: Admin y Usuario con permisos granulares
+- ✅ **Roles**: Super Admin y Usuario con permisos granulares
+- ✅ Super Admin tiene acceso ilimitado sin necesidad de permisos explícitos
 - ✅ Autorización por usuario (solo ven sus solicitudes)
-- ✅ Recursos protegidos (Users y Vehicles solo para admins)
+- ✅ Recursos protegidos (Users y Vehicles solo para super_admins)
 - ✅ Validación de datos de entrada
 - ✅ Protección CSRF
 - ✅ Sanitización de datos
@@ -461,6 +477,9 @@ Para más información o soporte, consultar la documentación adicional en la ca
 
 ### 🆕 Nuevas Funcionalidades (v1.1)
 - ✅ Sistema de roles y permisos con Filament Shield
+- ✅ Roles: `super_admin` (acceso completo) y `usuario` (acceso limitado)
+- ✅ Asignación automática de `super_admin` al primer usuario registrado
+- ✅ Asignación de roles desde la interfaz de Filament
 - ✅ Cancelación de solicitudes
 - ✅ Filtrado automático por usuario según rol
-- ✅ Protección de recursos (Users y Vehicles)
+- ✅ Protección de recursos (Users y Vehicles solo para super_admins)

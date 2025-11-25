@@ -29,7 +29,15 @@ class UserResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('view_any_user_resource') ?? false;
+        $user = auth()->user();
+        
+        // Super admin tiene acceso ilimitado
+        if ($user?->hasRole('super_admin')) {
+            return true;
+        }
+        
+        // Verificar permiso con formato de Shield: viewAny:UserResource
+        return $user?->can('viewAny:UserResource') ?? false;
     }
 
     public static function form(Schema $schema): Schema

@@ -282,8 +282,8 @@ class VehicleRequestsTable
                         }
                         
                         $canCancel = false;
-                        if (auth()->user()?->hasRole('admin')) {
-                            // Admin puede cancelar pendientes o aprobadas
+                        if (auth()->user()?->hasRole('super_admin')) {
+                            // Super Admin puede cancelar pendientes o aprobadas
                             $canCancel = ($record->request_status_id === $pendingStatus->id) ||
                                         ($record->request_status_id === $approvedStatus->id);
                         } else {
@@ -324,8 +324,8 @@ class VehicleRequestsTable
                         if (!$pendingStatus || !$approvedStatus) return false;
                         
                         // Usuarios solo pueden cancelar sus propias solicitudes pendientes
-                        // Admins pueden cancelar pendientes o aprobadas
-                        if (auth()->user()?->hasRole('admin')) {
+                        // Super Admins pueden cancelar pendientes o aprobadas
+                        if (auth()->user()?->hasRole('super_admin')) {
                             return ($record->request_status_id === $pendingStatus->id) ||
                                    ($record->request_status_id === $approvedStatus->id);
                         } else {

@@ -75,8 +75,28 @@ class UserInfolist
                                 default => null,
                             })
                             ->placeholder('Not set'),
+                        
+                        TextEntry::make('roles.name')
+                            ->label('Role')
+                            ->badge()
+                            ->color(fn (string $state): string => match (strtolower($state ?? '')) {
+                                'super_admin' => 'danger',
+                                'usuario' => 'gray',
+                                default => 'gray',
+                            })
+                            ->formatStateUsing(fn ($state) => match ($state) {
+                                'super_admin' => 'Super Admin',
+                                'usuario' => 'Usuario',
+                                default => ucfirst($state ?? 'No role'),
+                            })
+                            ->icon(fn ($state) => match ($state) {
+                                'super_admin' => 'heroicon-o-shield-check',
+                                'usuario' => 'heroicon-o-user',
+                                default => null,
+                            })
+                            ->placeholder('No role assigned'),
                     ])
-                    ->columns(2),
+                    ->columns(3),
                 
                 // Sección 3: Estadísticas
                 Section::make('Statistics')

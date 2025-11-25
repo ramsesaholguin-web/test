@@ -30,6 +30,25 @@ class EditUser extends EditRecord
             unset($data['password']);
         }
 
+        // Extraer el rol del array de datos antes de guardar
+        // El rol no es un campo del modelo User, así que lo removemos
+        $role = $data['role'] ?? null;
+        unset($data['role']);
+        
+        // Guardar el rol en una propiedad para usarlo después
+        if ($role) {
+            $this->roleToAssign = $role;
+        }
+
         return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        // Actualizar el rol después de guardar el usuario
+        if (isset($this->roleToAssign)) {
+            // Remover todos los roles actuales y asignar el nuevo
+            $this->record->syncRoles([$this->roleToAssign]);
+        }
     }
 }

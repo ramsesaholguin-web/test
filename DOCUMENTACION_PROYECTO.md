@@ -63,7 +63,7 @@ Un sistema web completo que permite:
 ### Objetivos Específicos
 
 #### Objetivo Principal
-Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, seleccionando fechas y vehículos disponibles, con un proceso de aprobación/rechazo por parte de administradores.
+Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, seleccionando fechas y vehículos disponibles, con un proceso de aprobación/rechazo por parte de super administradores.
 
 #### Objetivos Secundarios
 - Gestionar información completa de vehículos (marca, modelo, placa, estado, etc.)
@@ -118,7 +118,7 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 #### 2. **Solicitudes de Vehículos** (`VehicleRequests`) ⭐ Módulo Principal
 - Creación de solicitudes por usuarios
 - Selección de fechas y vehículos disponibles
-- Proceso de aprobación/rechazo por administradores
+- Proceso de aprobación/rechazo por super administradores
 - Validación de disponibilidad en tiempo real
 - Estados: Pendiente, Aprobada, Rechazada
 
@@ -257,7 +257,7 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 #### Cancelación de Solicitudes
 - ✅ Acción de cancelar implementada en vista y tabla
 - ✅ Usuarios regulares: Solo pueden cancelar sus solicitudes pendientes
-- ✅ Administradores: Pueden cancelar solicitudes pendientes o aprobadas
+- ✅ Super Administradores: Pueden cancelar solicitudes pendientes o aprobadas
 - ✅ Campo de motivo de cancelación (requerido)
 - ✅ Actualización automática de estado a "Cancelled"
 - ✅ Registro de quién y cuándo canceló
@@ -295,10 +295,12 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 - ✅ Seeder `RolesAndPermissionsSeeder` creado
 
 #### Roles Configurados
-- ✅ **admin**: Acceso completo al sistema
+- ✅ **super_admin**: Acceso completo e ilimitado al sistema
   - Puede ver todos los recursos (Users, Vehicles, Solicitudes, etc.)
   - Puede aprobar/rechazar/cancelar cualquier solicitud
   - Puede gestionar usuarios y vehículos
+  - Tiene acceso sin necesidad de permisos explícitos (verificado en código)
+  - **Asignación automática**: El primer usuario que se registre recibe automáticamente este rol
   
 - ✅ **usuario**: Acceso limitado
   - Solo puede ver sus propias solicitudes
@@ -306,18 +308,28 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
   - Puede editar sus solicitudes pendientes
   - Puede cancelar sus solicitudes pendientes
   - **NO** puede ver recursos Users ni Vehicles
+  - Requiere permisos específicos asignados desde `/admin/shield/roles`
 
 #### Permisos Aplicados
-- ✅ `UserResource`: Solo visible para usuarios con rol `admin`
-- ✅ `VehicleResource`: Solo visible para usuarios con rol `admin`
+- ✅ `UserResource`: Solo visible para usuarios con rol `super_admin`
+  - Verifica primero si el usuario es `super_admin` (acceso ilimitado)
+  - Luego verifica permiso `viewAny:UserResource` (formato Shield)
+- ✅ `VehicleResource`: Solo visible para usuarios con rol `super_admin`
+  - Verifica primero si el usuario es `super_admin` (acceso ilimitado)
+  - Luego verifica permiso `viewAny:VehicleResource` (formato Shield)
 - ✅ `VehicleRequestResource`: Visible para todos, con filtrado automático por rol
-- ✅ Acciones de aprobar/rechazar: Solo visibles para administradores
-- ✅ Acción de cancelar: Visible según rol (usuarios: sus pendientes, admins: todas)
+- ✅ Acciones de aprobar/rechazar: Solo visibles para super administradores
+- ✅ Acción de cancelar: Visible según rol (usuarios: sus pendientes, super_admins: todas)
 
 #### Filtrado Automático
 - ✅ `ListVehicleRequests`: Filtra automáticamente según rol
-  - Administradores: Ven todas las solicitudes
+  - Super Administradores: Ven todas las solicitudes
   - Usuarios regulares: Solo ven sus propias solicitudes
+
+#### Asignación de Roles
+- ✅ **Desde la interfaz de Filament**: Campo de selección de rol al crear/editar usuarios
+- ✅ **Automática**: El primer usuario registrado recibe `super_admin` automáticamente
+- ✅ **Observer**: `UserObserver` detecta el primer usuario y asigna el rol
 
 ### Widgets Implementados ✅
 
@@ -337,17 +349,17 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 
 #### Vista Administrativa de Solicitudes ✅
 - ✅ Vista de lista con filtrado automático por rol:
-  - Administradores ven TODAS las solicitudes
+  - Super Administradores ven TODAS las solicitudes
   - Usuarios regulares solo ven SUS solicitudes
 - ✅ Acciones de aprobar/rechazar desde la interfaz
-- ⏳ Filtros avanzados para administradores:
+- ⏳ Filtros avanzados para super administradores:
   - Por usuario (básico implementado)
   - Por vehículo (básico implementado)
   - Por rango de fechas
   - Por estado (básico implementado)
   - Por fecha de creación
 - ✅ Búsqueda básica implementada
-- ⏳ Estadísticas y reportes avanzados para administradores
+- ⏳ Estadísticas y reportes avanzados para super administradores
 
 #### Acciones de Aprobación/Rechazo ✅
 - ✅ Acción de aprobar solicitudes
@@ -387,12 +399,12 @@ Crear un sistema donde los usuarios puedan solicitar el uso de vehículos, selec
 
 #### Historial de Cambios
 - ⏳ Registro de cambios en solicitudes
-- ⏳ Auditoría de acciones de administradores
+- ⏳ Auditoría de acciones de super administradores
 - ⏳ Log de modificaciones
 
 #### Cancelación de Solicitudes ✅
 - ✅ Permitir a usuarios cancelar solicitudes pendientes
-- ✅ Permitir a administradores cancelar solicitudes aprobadas
+- ✅ Permitir a super administradores cancelar solicitudes aprobadas
 - ✅ Campo de razón de cancelación (requerido)
 - ✅ Estado "Cancelled" implementado
 - ✅ Validaciones por rol (usuarios solo sus pendientes)
@@ -680,7 +692,7 @@ CREATE INDEX idx_maintenances_vehicle ON maintenances(vehicle_id, maintenance_da
 3. Modificar los campos necesarios
 4. Guardar cambios
 
-### Para Administradores
+### Para Super Administradores
 
 #### Aprobar/Rechazar Solicitudes
 1. Navegar a "Solicitudes" (vista administrativa)
@@ -731,10 +743,10 @@ CREATE INDEX idx_maintenances_vehicle ON maintenances(vehicle_id, maintenance_da
 - ✅ Autenticación de usuarios
 - ✅ **Sistema de roles y permisos** (Filament Shield + Spatie Permission)
 - ✅ **Roles implementados**:
-  - `admin`: Acceso completo al sistema
-  - `usuario`: Acceso limitado (solo sus solicitudes)
+  - `super_admin`: Acceso completo e ilimitado al sistema (asignado automáticamente al primer usuario)
+  - `usuario`: Acceso limitado (solo sus solicitudes, requiere permisos específicos)
 - ✅ Permisos granulares por recurso
-- ✅ Recursos protegidos (Users y Vehicles solo para admins)
+- ✅ Recursos protegidos (Users y Vehicles solo para super_admins)
 - ✅ Autorización por usuario (solo ven sus solicitudes)
 - ✅ Filtrado automático por rol en ListVehicleRequests
 - ✅ Validación de datos de entrada
