@@ -13,6 +13,12 @@ class VehiculosMasUsados extends BaseWidget
     
     protected int | string | array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        // Visible para todos los usuarios (administradores y usuarios regulares)
+        return true;
+    }
+
     public function table(Table $table): Table
     {
         return $table

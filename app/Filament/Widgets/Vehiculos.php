@@ -12,6 +12,12 @@ class Vehiculos extends StatsOverviewWidget
 
     protected int | string | array $columnSpan = 1;
 
+    public static function canView(): bool
+    {
+        // Solo visible para administradores
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
+    
     protected function getStats(): array
     {
         $totalVehiculos = Vehicle::count();

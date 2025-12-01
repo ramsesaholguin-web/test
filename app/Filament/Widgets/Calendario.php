@@ -16,9 +16,15 @@ use Illuminate\Support\HtmlString;
 
 class Calendario extends CalendarWidget
 {
-    protected static ?int $sort = 7;
+    protected static ?int $sort = 4;
 
     protected string | HtmlString | null | bool $heading = 'Calendario de Solicitudes';
+
+    public static function canView(): bool
+    {
+        // Visible para todos los usuarios (administradores y usuarios regulares)
+        return true;
+    }
     
     // Habilitar clics en eventos
     protected bool $eventClickEnabled = true;
@@ -28,7 +34,7 @@ class Calendario extends CalendarWidget
 
     public function getEvents(FetchInfo $info): Collection | array | Builder
     {
-        return VehicleRequest::query()
+        $query = VehicleRequest::query()
             ->with(['user', 'vehicle', 'requestStatus'])
             ->where(function (Builder $query) use ($info) {
                 // Obtener solicitudes que se solapen con el rango de fechas del calendario
@@ -38,8 +44,14 @@ class Calendario extends CalendarWidget
                         $q->where('requested_departure_date', '<=', $info->start)
                             ->where('requested_return_date', '>=', $info->end);
                     });
-            })
-            ->get()
+            });
+
+        // Si el usuario no es super_admin, filtrar solo sus solicitudes
+        if (!auth()->user()?->hasRole('super_admin')) {
+            $query->where('user_id', auth()->id());
+        }
+
+        return $query->get()
             ->map(function (VehicleRequest $request) {
                 return CalendarEvent::make()
                     ->key($request->id)

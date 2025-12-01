@@ -192,6 +192,10 @@ class VehicleRequestsTable
                     })
                     ->visible(function ($record) {
                         if (!$record) return false;
+                        // Solo super_admins pueden aprobar solicitudes
+                        if (!auth()->user()?->hasRole('super_admin')) {
+                            return false;
+                        }
                         $pendingStatus = RequestStatus::where('name', 'Pending')->first();
                         return $pendingStatus && $record->request_status_id === $pendingStatus->id;
                     }),
@@ -244,6 +248,10 @@ class VehicleRequestsTable
                     })
                     ->visible(function ($record) {
                         if (!$record) return false;
+                        // Solo super_admins pueden rechazar solicitudes
+                        if (!auth()->user()?->hasRole('super_admin')) {
+                            return false;
+                        }
                         $pendingStatus = RequestStatus::where('name', 'Pending')->first();
                         return $pendingStatus && $record->request_status_id === $pendingStatus->id;
                     }),

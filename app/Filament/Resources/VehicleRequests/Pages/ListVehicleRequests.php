@@ -21,6 +21,11 @@ class ListVehicleRequests extends ListRecords
 
     protected function getHeaderWidgets(): array
     {
+        // Solo super_admins pueden ver los widgets
+        if (!auth()->user()?->hasRole('super_admin')) {
+            return [];
+        }
+        
         return [
             VehicleRequestsStats::class,
         ];

@@ -40,6 +40,10 @@ class ViewVehicleRequest extends ViewRecord
                     $this->approveRequest($data['approval_note'] ?? null);
                 })
                 ->visible(function () {
+                    // Solo super_admins pueden aprobar solicitudes
+                    if (!auth()->user()?->hasRole('super_admin')) {
+                        return false;
+                    }
                     $pendingStatus = RequestStatus::where('name', 'Pending')->first();
                     return $pendingStatus && $this->record->request_status_id === $pendingStatus->id;
                 }),
@@ -69,6 +73,10 @@ class ViewVehicleRequest extends ViewRecord
                     $this->rejectRequest($data['approval_note']);
                 })
                 ->visible(function () {
+                    // Solo super_admins pueden rechazar solicitudes
+                    if (!auth()->user()?->hasRole('super_admin')) {
+                        return false;
+                    }
                     $pendingStatus = RequestStatus::where('name', 'Pending')->first();
                     return $pendingStatus && $this->record->request_status_id === $pendingStatus->id;
                 }),

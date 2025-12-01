@@ -10,9 +10,15 @@ class EstadisticasSolicitudes extends StatsOverviewWidget
 {
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 3;
+    protected int | string | array $columnSpan = 4;
 
     protected ?string $heading = 'Estadísticas de Solicitudes';
+
+    public static function canView(): bool
+    {
+        // Solo visible para administradores
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
 
     protected function getStats(): array
     {
